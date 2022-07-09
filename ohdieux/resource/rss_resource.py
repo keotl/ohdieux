@@ -1,6 +1,7 @@
 import logging
 import threading
 from datetime import datetime
+from email.utils import formatdate
 
 from jivago.inject.annotation import Singleton
 from jivago.lang.annotations import Inject
@@ -46,9 +47,10 @@ class RssResource(object):
         return RenderedView("manifest.xml",
                             {"programme": programme.programme,
                              "episodes": Stream(programme.episodes)
-                            .map(lambda x: EpisodeDescriptor(x.title, x.description, x.guid, x.date, x.duration,
+                            .map(lambda x: EpisodeDescriptor(x.title, x.description, x.guid,
+                                                             formatdate(float(x.date.strftime("%s"))), x.duration,
                                                              MediaDescriptor(x.media.media_url, x.media.media_type,
                                                                              x.media.length))
                                  ).toList(),
-                             "now": datetime.now().isoformat()
+                             "now": formatdate(float(datetime.now().strftime("%s")))
                              }, content_type="text/xml")

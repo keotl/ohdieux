@@ -34,7 +34,7 @@
       <itunes:duration>{{episode.duration}}</itunes:duration>
       <!-- <itunes:category text="News &amp; Politics"/> -->
       <itunes:explicit>clean</itunes:explicit>
-      <!-- <pubDate>{{episode.date}}</pubDate> -->
+      <pubDate>{{episode.date}}</pubDate>
     </item>
     {% endfor %}
   </channel>

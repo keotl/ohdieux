@@ -7,6 +7,7 @@ from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
 from ohdieux.model.programme_descriptor import ProgrammeDescriptor
 
 from ohdieux.ohdio.ohdio_api import ApiException, OhdioApi
+from ohdieux.util.dateparse import parse_fr_date
 
 
 class OhdioProgrammeResponseProxy(object):
@@ -54,7 +55,7 @@ class OhdioProgrammeResponseProxy(object):
             title=clean(json["title"]),
             description=clean(json["summary"]),
             guid=json["url"],
-            date=datetime.now(),  # TODO parse FR human date
+            date=parse_fr_date(json["media2"]["details"]),
             duration=json["media2"]["duration"]["durationInSeconds"],
             media=MediaDescriptorProxy(self._api,
                                        json["media2"]["id"],
