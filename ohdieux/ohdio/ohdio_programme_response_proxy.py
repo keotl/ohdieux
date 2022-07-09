@@ -44,14 +44,18 @@ class OhdioProgrammeResponseProxy(object):
                 for x in response["content"]["contentDetail"]["items"]:
                     episode_id = x["media2"]["context"]["id"]
                     segments = self._api.query_episode_segments(self.programme_id, episode_id)
-                    distinct_streams = Stream(segments["content"]["contentDetail"]["items"])\
-                        .map(lambda i: i["media2"]["id"]).toSet()
+                    distinct_streams = []
+
+                    for segment in segments["content"]["contentDetail"]["items"]:
+                        stream_id = segment["media2"]["id"]
+                        if stream_id not in distinct_streams:
+                            distinct_streams.append(stream_id)
                     if self.reverse_episode_segments:
-                        distinct_streams = [*distinct_streams][::-1]
+                        distinct_streams = distinct_streams[::-1]
+
                     for stream_id in distinct_streams:
                         res.append(self._map_episode(x, stream_id))
                 current_page += 1
-                # break # TODO remove
             except ApiException:
                 break
 

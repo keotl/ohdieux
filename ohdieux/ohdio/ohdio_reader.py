@@ -12,5 +12,5 @@ class OhdioReader(object):
     def __init__(self, api: OhdioApi):
         self._api = api
 
-    def query(self, programme_id: str) -> OhdioProgrammeResponseProxy:
-        return OhdioProgrammeResponseProxy(self._api, programme_id)
+    def query(self, programme_id: str, reverse_segments: bool) -> OhdioProgrammeResponseProxy:
+        return OhdioProgrammeResponseProxy(self._api, programme_id, reverse_segments)

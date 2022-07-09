@@ -29,7 +29,8 @@ class RssResource(object):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @GET
-    def cached(self, programme_id: QueryParam[str], reverse: OptionalQueryParam[bool] = False):
+    def cached(self, programme_id: QueryParam[str], reverse: OptionalQueryParam[str]):
+        reverse = reverse in ("true", "True", "1")
         with self._lock:
             if (programme_id, reverse) not in self._cache:
                 self._cache[(programme_id, reverse)] = {"lock": threading.Lock(), "updated": datetime.min, "content": None}
@@ -43,7 +44,7 @@ class RssResource(object):
         return cache_entry["content"]
 
     def get_manifest(self, programme_id: QueryParam[str], reverse: OptionalQueryParam[bool]):
-        programme = self._ohdio_reader.query(str(programme_id))
+        programme = self._ohdio_reader.query(str(programme_id), bool(reverse))
         return RenderedView("manifest.xml",
                             {"programme": programme.programme,
                              "episodes": Stream(programme.episodes)
