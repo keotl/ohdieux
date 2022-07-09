@@ -52,8 +52,8 @@ class OhdioProgrammeResponseProxy(object):
 
     def _map_episode(self, json: dict) -> Optional[EpisodeDescriptor]:
         return EpisodeDescriptor(
-            title=json["title"],
-            description=json["summary"],
+            title=clean(json["title"]),
+            description=clean(json["summary"]),
             guid=json["url"],
             date=datetime.now(), # TODO parse FR human date
             duration=json["media2"]["duration"]["durationInSeconds"],
@@ -65,11 +65,11 @@ class OhdioProgrammeResponseProxy(object):
     def _fetch_programme(self):
         json = self._api.query_programme(self.programme_id)
         self._programme = ProgrammeDescriptor(
-            title=json["header"]["title"],
-            description=json["header"]["summary"],
+            title=clean(json["header"]["title"]),
+            description=clean(json["header"]["summary"]),
             author="Radio-Canada",
             link=json["header"]["share"]["url"],
-            image_url=json["header"]["picture"]["url"],
+            image_url=json["header"]["picture"]["url"].replace("{0}", "400").replace("{1}", "1x1"),
         )
 
 class MediaDescriptorProxy(MediaDescriptor):
@@ -91,12 +91,13 @@ class MediaDescriptorProxy(MediaDescriptor):
 
     @property
     def media_type(self) -> str:
-        if self._content is None:
-            self._fetch()
-        return Stream(self._content["params"])\
-            .firstMatch(lambda x: x["name"] == "contentType")\
-            .map(lambda x: x["value"])\
-            .orElse("")
+        return "audio/mpeg" # Has to be overwritten since vnd.apple.mpegURL is not recognized by Apple Podcasts
+        # if self._content is None:
+        #     self._fetch()
+        # return Stream(self._content["params"])\
+        #     .firstMatch(lambda x: x["name"] == "contentType")\
+        #     .map(lambda x: x["value"])\
+        #     .orElse("")
 
     @property
     def length(self) -> int:
@@ -107,3 +108,6 @@ class MediaDescriptorProxy(MediaDescriptor):
             self._content = self._api.query_media(self._media_id)
         except ApiException:
             pass # TODO
+
+def clean(human_readable_text: str) -> str:
+    return human_readable_text.replace("&nbsp;", " ")

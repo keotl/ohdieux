@@ -6,4 +6,4 @@ import ohdieux
 app = JivagoApplication(ohdieux)
 
 if __name__ == '__main__':
-    app.run_dev(logging_level=logging.DEBUG)
+    app.run_dev(host="0.0.0.0",logging_level=logging.DEBUG)
