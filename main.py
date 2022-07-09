@@ -10,7 +10,13 @@ from jivago.wsgi.routing.serving.static_file_routing_table import StaticFileRout
 import ohdieux
 import ohdieux.views
 
-logging.getLogger().setLevel(logging.INFO)
+LOG_LEVEL = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR
+}
+logging.getLogger().setLevel(LOG_LEVEL.get(os.environ.get("LOG_LEVEL", "INFO"), logging.INFO))
 
 
 class Context(ProductionJivagoContext):
