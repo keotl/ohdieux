@@ -18,7 +18,7 @@ class OhdioProgrammeResponseProxy(object):
         self._programme: Optional[ProgrammeDescriptor] = None
 
     @property
-    def show(self) -> ProgrammeDescriptor:
+    def programme(self) -> ProgrammeDescriptor:
         if self._programme is None:
             self._fetch_programme()
 
@@ -37,14 +37,18 @@ class OhdioProgrammeResponseProxy(object):
         while True:
             try:
                 response = self._api.query_episodes(self.programme_id, current_page)
+                if not response["content"]["contentDetail"]["items"]:
+                    break
                 res.extend(
                     Stream(response["content"]["contentDetail"]["items"])
                     .map(self._map_episode)
                     .filter(lambda x: x is not None))
+                current_page += 1
+                break # TODO remove
             except ApiException:
                 break
 
-        return res
+        self._episodes = res
 
     def _map_episode(self, json: dict) -> Optional[EpisodeDescriptor]:
         return EpisodeDescriptor(
@@ -61,11 +65,11 @@ class OhdioProgrammeResponseProxy(object):
     def _fetch_programme(self):
         json = self._api.query_programme(self.programme_id)
         self._programme = ProgrammeDescriptor(
-            title=json["title"],
-            description=json["summary"],
+            title=json["header"]["title"],
+            description=json["header"]["summary"],
             author="Radio-Canada",
-            link=json["share"]["url"],
-            image_url=json["picture"]["url"],
+            link=json["header"]["share"]["url"],
+            image_url=json["header"]["picture"]["url"],
         )
 
 class MediaDescriptorProxy(MediaDescriptor):
@@ -89,8 +93,10 @@ class MediaDescriptorProxy(MediaDescriptor):
     def media_type(self) -> str:
         if self._content is None:
             self._fetch()
-
-        return self._content["params"]["contentType"]  # type: ignore
+        return Stream(self._content["params"])\
+            .firstMatch(lambda x: x["name"] == "contentType")\
+            .map(lambda x: x["value"])\
+            .orElse("")
 
     @property
     def length(self) -> int:

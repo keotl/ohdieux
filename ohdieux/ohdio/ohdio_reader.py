@@ -1,9 +1,16 @@
 from jivago.inject.annotation import Component
-from ohdieux.ohdio.ohdio_show_response_proxy import OhdioProgrammeResponseProxy
+from jivago.lang.annotations import Inject
+from ohdieux.ohdio.ohdio_api import OhdioApi
 
+from ohdieux.ohdio.ohdio_programme_response_proxy import OhdioProgrammeResponseProxy
 
 @Component
 class OhdioReader(object):
 
-    def query(self, show_id: str) -> OhdioProgrammeResponseProxy:
-        return OhdioProgrammeResponseProxy(show_id)
+    @Inject
+    def __init__(self, api: OhdioApi):
+        self._api = api
+        
+
+    def query(self, programme_id: str) -> OhdioProgrammeResponseProxy:
+        return OhdioProgrammeResponseProxy(self._api, programme_id)

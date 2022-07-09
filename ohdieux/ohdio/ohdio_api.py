@@ -1,4 +1,5 @@
-from jivago.inject.annotation import Component
+from jivago.inject.annotation import Component, Provider
+from jivago.lang.annotations import Inject
 import requests
 import logging
 
@@ -13,7 +14,8 @@ class OhdioApi(object):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     def query_episodes(self, programme_id: str, page_number) -> dict:
-        response = requests.get(self.base_url + programme_id + "/" + page_number)
+        self._logger.debug(f"Querying episodes for programme: {programme_id}/{page_number}.")
+        response = requests.get(self.base_url + programme_id + "/" + str(page_number))
         if response.ok:
             return response.json()
         else:
@@ -37,3 +39,6 @@ class OhdioApi(object):
             raise ApiException(response.text)
 
     
+@Provider
+def ohdio_api_provider() -> OhdioApi:
+    return OhdioApi()
