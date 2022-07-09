@@ -39,11 +39,13 @@ class RssResource(object):
         with cache_entry["lock"]:
             if (datetime.now() - cache_entry["updated"]).total_seconds() > self._cache_refresh_delay:
                 self._logger.info(f"Refreshing programme {programme_id}.")
+                start_time = datetime.now()
                 cache_entry["content"] = self.get_manifest(programme_id, reverse)
                 cache_entry["updated"] = datetime.now()
+                self._logger.info(f"Completed refresh of programme {programme_id} in {datetime.now() - start_time}.")
         return cache_entry["content"]
 
-    def get_manifest(self, programme_id: QueryParam[str], reverse: OptionalQueryParam[bool]):
+    def get_manifest(self, programme_id: QueryParam[str], reverse: bool):
         programme = self._ohdio_reader.query(str(programme_id), bool(reverse))
         return RenderedView("manifest.xml",
                             {"programme": programme.programme,
