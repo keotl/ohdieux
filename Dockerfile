@@ -14,5 +14,5 @@ RUN adduser app -G nobody -u 2000 -D -H
 #RUN chown -R app:app /app
 USER app:nobody
 
-EXPOSE 80
-CMD ["gunicorn", "--workers=1", "--threads=4","--bind=0.0.0.0:80", "main"]
+EXPOSE 8080
+CMD ["gunicorn", "--workers=1", "--threads=4","--bind=0.0.0.0:8080", "main"]
