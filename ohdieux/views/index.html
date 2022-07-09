@@ -24,13 +24,19 @@
 
     <input id="programme_id"/>
     <button id="submit">Soumettre / Submit </button>
+    <input type="checkbox" id="reverse"
+    /><label for="reverse">Inverser ordre segments / Reverse segment
+    ordering </label>
     <br/>
     <a id="rss"> </a>
 
   </body>
   <script>
     document.getElementById("submit").onclick = e => {
-	const link = "/rss?programme_id=" + document.getElementById("programme_id").value;
+	let link = "/rss?programme_id=" +  document.getElementById("programme_id").value;
+	if (document.getElementById("reverse").checked) {
+	    link = link + "&reverse=true"
+	}
 	document.getElementById("rss").href = link;
 	document.getElementById("rss").innerHTML = document.getElementById("rss").href;
     };

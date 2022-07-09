@@ -8,7 +8,7 @@ from jivago.lang.annotations import Inject
 from jivago.lang.stream import Stream
 from jivago.templating.rendered_view import RenderedView
 from jivago.wsgi.annotations import Resource
-from jivago.wsgi.invocation.parameters import QueryParam
+from jivago.wsgi.invocation.parameters import QueryParam, OptionalQueryParam
 from jivago.wsgi.methods import GET
 
 from ohdieux.config import Config
@@ -29,20 +29,20 @@ class RssResource(object):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @GET
-    def cached(self, programme_id: QueryParam[str]):
+    def cached(self, programme_id: QueryParam[str], reverse: OptionalQueryParam[bool] = False):
         with self._lock:
-            if programme_id not in self._cache:
-                self._cache[programme_id] = {"lock": threading.Lock(), "updated": datetime.min, "content": None}
+            if (programme_id, reverse) not in self._cache:
+                self._cache[(programme_id, reverse)] = {"lock": threading.Lock(), "updated": datetime.min, "content": None}
 
-        cache_entry = self._cache[programme_id]
+        cache_entry = self._cache[(programme_id, reverse)]
         with cache_entry["lock"]:
             if (datetime.now() - cache_entry["updated"]).total_seconds() > self._cache_refresh_delay:
                 self._logger.info(f"Refreshing programme {programme_id}.")
-                cache_entry["content"] = self.get_manifest(programme_id)
+                cache_entry["content"] = self.get_manifest(programme_id, reverse)
                 cache_entry["updated"] = datetime.now()
         return cache_entry["content"]
 
-    def get_manifest(self, programme_id: QueryParam[str]):
+    def get_manifest(self, programme_id: QueryParam[str], reverse: OptionalQueryParam[bool]):
         programme = self._ohdio_reader.query(str(programme_id))
         return RenderedView("manifest.xml",
                             {"programme": programme.programme,

@@ -12,7 +12,8 @@ from ohdieux.util.dateparse import parse_fr_date
 
 class OhdioProgrammeResponseProxy(object):
 
-    def __init__(self, api: OhdioApi, show_id: str):
+    def __init__(self, api: OhdioApi, show_id: str, reverse_episode_segments: bool = False):
+        self.reverse_episode_segments = reverse_episode_segments
         self.programme_id = show_id
         self._api = api
         self._episodes: Optional[List[EpisodeDescriptor]] = None
@@ -40,25 +41,31 @@ class OhdioProgrammeResponseProxy(object):
                 response = self._api.query_episodes(self.programme_id, current_page)
                 if not response["content"]["contentDetail"]["items"]:
                     break
-                res.extend(
-                    Stream(response["content"]["contentDetail"]["items"])
-                    .map(self._map_episode)
-                    .filter(lambda x: x is not None))
+                for x in response["content"]["contentDetail"]["items"]:
+                    episode_id = x["media2"]["context"]["id"]
+                    segments = self._api.query_episode_segments(self.programme_id, episode_id)
+                    distinct_streams = Stream(segments["content"]["contentDetail"]["items"])\
+                        .map(lambda i: i["media2"]["id"]).toSet()
+                    if self.reverse_episode_segments:
+                        distinct_streams = [*distinct_streams][::-1]
+                    for stream_id in distinct_streams:
+                        res.append(self._map_episode(x, stream_id))
                 current_page += 1
+                # break # TODO remove
             except ApiException:
                 break
 
         self._episodes = res
 
-    def _map_episode(self, json: dict) -> Optional[EpisodeDescriptor]:
+    def _map_episode(self, json: dict, stream_id: str) -> Optional[EpisodeDescriptor]:
         return EpisodeDescriptor(
             title=clean(json["title"]),
             description=clean(json["summary"]),
-            guid=json["url"],
+            guid=stream_id,
             date=parse_fr_date(json["media2"]["details"]),
             duration=json["media2"]["duration"]["durationInSeconds"],
             media=MediaDescriptorProxy(self._api,
-                                       json["media2"]["id"],
+                                    stream_id,
                                        json["media2"]["duration"]["durationInSeconds"])
         )
 
