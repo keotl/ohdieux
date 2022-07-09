@@ -1,9 +1,10 @@
 certifi==2022.6.15
 charset-normalizer==2.1.0
 croniter==1.3.5
+gunicorn==20.1.0
 idna==3.3
 Jinja2==3.1.2
-jivago==0.6.2
+jivago @ git+https://github.com/keotl/jivago@42fbfb09ed08c58d9f3dceebb8c9fd38dc70ec12 # TODO upgrade to 0.6.3 when available
 MarkupSafe==2.1.1
 python-dateutil==2.8.2
 PyYAML==6.0

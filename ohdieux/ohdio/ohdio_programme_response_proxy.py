@@ -44,7 +44,6 @@ class OhdioProgrammeResponseProxy(object):
                     .map(self._map_episode)
                     .filter(lambda x: x is not None))
                 current_page += 1
-                break # TODO remove
             except ApiException:
                 break
 
@@ -55,7 +54,7 @@ class OhdioProgrammeResponseProxy(object):
             title=clean(json["title"]),
             description=clean(json["summary"]),
             guid=json["url"],
-            date=datetime.now(), # TODO parse FR human date
+            date=datetime.now(),  # TODO parse FR human date
             duration=json["media2"]["duration"]["durationInSeconds"],
             media=MediaDescriptorProxy(self._api,
                                        json["media2"]["id"],
@@ -72,6 +71,7 @@ class OhdioProgrammeResponseProxy(object):
             image_url=json["header"]["picture"]["url"].replace("{0}", "400").replace("{1}", "1x1"),
         )
 
+
 class MediaDescriptorProxy(MediaDescriptor):
 
     def __init__(self, api: OhdioApi, media_id: str, length: int):
@@ -84,14 +84,14 @@ class MediaDescriptorProxy(MediaDescriptor):
     def media_url(self) -> str:
         if self._content is None:
             self._fetch()
-        
+
         return Nullable(self._content) \
             .map(lambda x: x.get("url")) \
-            .orElse("") # type: ignore
+            .orElse("")  # type: ignore
 
     @property
     def media_type(self) -> str:
-        return "audio/mpeg" # Has to be overwritten since vnd.apple.mpegURL is not recognized by Apple Podcasts
+        return "audio/mpeg"  # Has to be overwritten since vnd.apple.mpegURL is not recognized by Apple Podcasts
         # if self._content is None:
         #     self._fetch()
         # return Stream(self._content["params"])\
@@ -107,7 +107,8 @@ class MediaDescriptorProxy(MediaDescriptor):
         try:
             self._content = self._api.query_media(self._media_id)
         except ApiException:
-            pass # TODO
+            pass  # TODO
+
 
 def clean(human_readable_text: str) -> str:
     return human_readable_text.replace("&nbsp;", " ")
