@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+  <channel>
+    <copyright>NHK (Japan Broadcasting Corporation)</copyright>
+    <description>
+      This is the latest news in English from NHK WORLD RADIO JAPAN. This service is daily updated. For more information, please go to https://www3.nhk.or.jp/nhkworld/.
+    </description>
+    <itunes:subtitle>
+      This is the latest news in English from NHK WORLD RADIO JAPAN. This service is daily updated. For more information, please go to https://www3.nhk.or.jp/nhkworld/.
+    </itunes:subtitle>
+    <itunes:author>NHK WORLD-JAPAN</itunes:author>
+    <itunes:image href="https://www3.nhk.or.jp/rj/images/english_1500x1500.png"/>
+    <language>en</language>
+    <link>https://www3.nhk.or.jp/nhkworld/</link>
+    <lastBuildDate>Sat, 09 Jul 2022 18:11:37 +0900</lastBuildDate>
+    <title>English News - NHK WORLD RADIO JAPAN</title>
+    <itunes:category text="News &amp; Politics"/>
+    <itunes:owner>
+      <itunes:email>nw-podcast@nhk.jp</itunes:email>
+    </itunes:owner>
+    <itunes:explicit>clean</itunes:explicit>
+    <image>
+      <url>https://www3.nhk.or.jp/rj/images/english_1500x1500.png</url>
+      <title>English News - NHK WORLD RADIO JAPAN</title>
+      <link>https://www3.nhk.or.jp/nhkworld/upld/medias/en/radio/news/20220709180000_english_1.mp3</link>
+    </image>
+    <item>
+      <enclosure url="https://www3.nhk.or.jp/nhkworld/upld/medias/en/radio/news/20220709180000_english_1.mp3" length="4803021" type="audio/mpeg"/>
+      <title>
+	NHK WORLD RADIO JAPAN - English News at 18:00 (JST), July 09
+      </title>
+      <description>
+	NHK WORLD RADIO JAPAN - English News at 18:00 (JST), July 09
+      </description>
+      <guid>https://www3.nhk.or.jp/nhkworld/upld/medias/en/radio/news/20220709180000_english_1.mp3</guid>
+      <itunes:author>NHK WORLD-JAPAN</itunes:author>
+      <itunes:duration>10:00</itunes:duration>
+      <itunes:category text="News &amp; Politics"/>
+      <itunes:explicit>clean</itunes:explicit>
+      <pubDate>Sat, 09 Jul 2022 18:10:00 +0900</pubDate>
+    </item>
+  </channel>
+</rss>
