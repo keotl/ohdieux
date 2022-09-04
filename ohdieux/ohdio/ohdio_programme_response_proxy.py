@@ -123,4 +123,4 @@ class MediaDescriptorProxy(MediaDescriptor):
 
 
 def clean(human_readable_text: str) -> str:
-    return human_readable_text.replace("&nbsp;", " ")
+    return (human_readable_text or "").replace("&nbsp;", " ").replace("&", "&amp;")
