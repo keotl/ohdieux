@@ -17,10 +17,14 @@ class ManifestService(object):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     def generate_podcast_manifest(self, programme_id: str, reverse_segments: bool) -> Programme:
-        try:
-            return self._reader_v2.query(programme_id, reverse_segments)
-            
-        except Exception as e:
-            self._logger.warning(f"Failed to generate manifest for programme {programme_id} using v2 reader.", e)
+        for reader in [self._reader_v2, self._ohdio_reader]:
+            try:
+                res = reader.query(programme_id, reverse_segments)
+                if res.programme is None:
+                    self._logger.warning(f"Failed to generate manifest for programme {programme_id} using {reader.__class__} reader.")
+                    continue
+                return res
+            except Exception as e:
+                self._logger.warning(f"Failed to generate manifest for programme {programme_id} using {reader.__class__} reader.", e)
 
-        return self._ohdio_reader.query(programme_id, reverse_segments)
+            return self._ohdio_reader.query(programme_id, reverse_segments)
