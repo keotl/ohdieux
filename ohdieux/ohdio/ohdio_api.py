@@ -27,11 +27,11 @@ class OhdioApi(object):
 
     def query_episode_segments(self, programme_id: str, episode_id: str) -> dict:
         self._logger.debug(f"Querying episode segments for programme: {programme_id}/{episode_id}.")
-        response = requests.get(f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes/{programme_id}/episodes/{episode_id}")
+        response = requests.get(f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes/{programme_id}/episodes/{episode_id}", timeout=10)
         if response.ok:
             return response.json()
         else:
-            self._logger.debug(f"Failed to retrieve episode {episode_id}.")
+            self._logger.debug(f"Failed to retrieve segments for episode {episode_id}.", response.text)
             raise ApiException(response.text)
 
     def query_programme(self, programme_id: str) -> dict:
