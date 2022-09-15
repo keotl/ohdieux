@@ -70,7 +70,7 @@ class OhdioProgrammeResponseProxy(Programme):
             date=parse_fr_date(json["media2"]["details"]),
             duration=json["media2"]["duration"]["durationInSeconds"],
             media=MediaDescriptorProxy(self._api,
-                                    stream_id,
+                                       stream_id,
                                        json["media2"]["duration"]["durationInSeconds"])
         )
 
@@ -124,4 +124,7 @@ class MediaDescriptorProxy(MediaDescriptor):
 
 
 def clean(human_readable_text: str) -> str:
-    return (human_readable_text or "").replace("&nbsp;", " ").replace("&", "&amp;")
+    return (human_readable_text or "") \
+        .replace("&nbsp;", " ") \
+        .replace("&", "&amp; ") \
+        .replace("<br>", "<br/>")
