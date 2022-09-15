@@ -4,13 +4,14 @@ from jivago.lang.stream import Stream
 from jivago.lang.nullable import Nullable
 
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
+from ohdieux.model.programme import Programme
 from ohdieux.model.programme_descriptor import ProgrammeDescriptor
 
 from ohdieux.ohdio.ohdio_api import ApiException, OhdioApi
 from ohdieux.util.dateparse import parse_fr_date
 
 
-class OhdioProgrammeResponseProxy(object):
+class OhdioProgrammeResponseProxy(Programme):
 
     def __init__(self, api: OhdioApi, show_id: str, reverse_episode_segments: bool = False):
         self.reverse_episode_segments = reverse_episode_segments

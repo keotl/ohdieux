@@ -14,6 +14,7 @@ from jivago.wsgi.methods import GET
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
 from ohdieux.ohdio.ohdio_reader import OhdioReader
+from ohdieux.ohdio.ohdio_reader_v2 import OhdioReaderV2
 
 
 @Resource("/rss")
@@ -21,7 +22,7 @@ from ohdieux.ohdio.ohdio_reader import OhdioReader
 class RssResource(object):
 
     @Inject
-    def __init__(self, ohdio_reader: OhdioReader, config: Config):
+    def __init__(self, ohdio_reader: OhdioReaderV2, config: Config):
         self._ohdio_reader = ohdio_reader
         self._cache = {}
         self._lock = threading.Lock()

@@ -31,7 +31,7 @@ class OhdioApi(object):
         if response.ok:
             return response.json()
         else:
-            self._logger.debug(f"Failed to retrieve episode {episode_id}.")
+            self._logger.debug(f"Failed to retrieve segments for episode {episode_id}.", response.text)
             raise ApiException(response.text)
 
     def query_programme(self, programme_id: str) -> dict:
