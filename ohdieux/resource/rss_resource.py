@@ -15,6 +15,7 @@ from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
 from ohdieux.ohdio.ohdio_reader import OhdioReader
 from ohdieux.ohdio.ohdio_reader_v2 import OhdioReaderV2
+from ohdieux.service.manifest_service import ManifestService
 
 
 @Resource("/rss")
@@ -22,8 +23,8 @@ from ohdieux.ohdio.ohdio_reader_v2 import OhdioReaderV2
 class RssResource(object):
 
     @Inject
-    def __init__(self, ohdio_reader: OhdioReaderV2, config: Config):
-        self._ohdio_reader = ohdio_reader
+    def __init__(self, manifest_service: ManifestService, config: Config):
+        self._manifest_service = manifest_service
         self._cache = {}
         self._lock = threading.Lock()
         self._cache_refresh_delay = config.cache_refresh_delay_s
@@ -47,7 +48,7 @@ class RssResource(object):
         return cache_entry["content"]
 
     def get_manifest(self, programme_id: QueryParam[str], reverse: bool):
-        programme = self._ohdio_reader.query(str(programme_id), bool(reverse))
+        programme = self._manifest_service.generate_podcast_manifest(str(programme_id), bool(reverse))
         return RenderedView("manifest.xml",
                             {"programme": programme.programme,
                              "episodes": Stream(programme.episodes)

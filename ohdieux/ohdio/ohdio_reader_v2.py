@@ -61,11 +61,8 @@ class OhdioReaderV2(object):
                     link="http://ici.radio-canada.ca" + json["header"]["share"]["url"],
                     image_url=json["header"]["picture"]["url"].replace("{0}", "400").replace("{1}", "1x1"),
                 )
-            # TODO remove
-            break
-        # segment_urls = Stream.zip(episode_media_ids, itertools.repeat(reverse_segments)).map(lambda a,b: _fetch_stream_url(a,b)).toList()
+
         segment_urls = self._pool.starmap(_fetch_stream_url, zip(episode_media_ids, itertools.repeat(reverse_segments)))
-        print("hello")
         episodes = []
         for incomplete_episode_descriptor, stream_urls in zip(incomplete_episode_descriptors, segment_urls):
             episodes.append(Stream(stream_urls).map(lambda url:
