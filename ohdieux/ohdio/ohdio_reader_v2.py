@@ -61,6 +61,7 @@ class OhdioReaderV2(object):
                     link="http://ici.radio-canada.ca" + json["header"]["share"]["url"],
                     image_url=json["header"]["picture"]["url"].replace("{0}", "400").replace("{1}", "1x1"),
                 )
+            page_number += 1
 
         segment_urls = self._pool.starmap(_fetch_stream_url, zip(episode_media_ids, itertools.repeat(reverse_segments)))
         episodes = []
