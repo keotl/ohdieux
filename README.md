@@ -13,7 +13,7 @@ be consumed in any third-party app, such as Apple Podcasts.
    Head over to [https://ohdieux.ligature.ca](https://ohdieux.ligature.ca).
 2. Prenez note du code d'émission sur le site de Radio-Canada **Oh**dio.
    Write down the programme number on Radio-Canada **Oh**dio.
-   [Instructions](/ohdieux/static/instructions.png)
+   [Instructions](/ohdieux/views/instructions.png)
 3. Copiez le lien RSS généré par le site pour votre émission dans votre application de balados.
    Copy the generated RSS link into your podcasts application.
 
