@@ -54,17 +54,17 @@ class OhdioProgrammeResponseProxy(Programme):
                     if self.reverse_episode_segments:
                         distinct_streams = distinct_streams[::-1]
 
-                    for stream_id in distinct_streams:
-                        res.append(self._map_episode(x, stream_id))
+                    for i, stream_id in enumerate(distinct_streams):
+                        res.append(self._map_episode(x, stream_id, index=(i + 1) if len(distinct_streams) > 1 else None))
                 current_page += 1
             except ApiException:
                 break
 
         self._episodes = res
 
-    def _map_episode(self, json: dict, stream_id: str) -> Optional[EpisodeDescriptor]:
+    def _map_episode(self, json: dict, stream_id: str, index=None) -> Optional[EpisodeDescriptor]:
         return EpisodeDescriptor(
-            title=clean(json["title"]),
+            title=clean(json["title"]) + (f" ({index})" if index is not None else ""),
             description=clean(json["summary"]),
             guid=stream_id,
             date=parse_fr_date(json["media2"]["details"]),

@@ -1,3 +1,4 @@
+import json
 import re
 from datetime import datetime
 from typing import Optional
@@ -40,10 +41,10 @@ ABBR_MONTHS = {
 def parse_fr_date(formatted: str) -> datetime:
     day, month, year = formatted.lower().split(" ")
     try:
-        return datetime(int(year), MONTHS[month], int(day))
+        return datetime(int(year), MONTHS[month], int(day.rstrip("er")))
     except:
         pass
-    return datetime(int(year), ABBR_MONTHS[month], int(day))
+    return datetime(int(year), ABBR_MONTHS[month], int(day.rstrip("er")))
 
 
 def infer_fr_date(item: dict) -> datetime:
@@ -63,7 +64,7 @@ def infer_fr_date(item: dict) -> datetime:
 def extract_tentative_date(text: str) -> Optional[datetime]:
     for month in Stream(MONTHS.keys(), ABBR_MONTHS.keys()):
         try:
-            match = re.search(r"\d{1,2} (" + month + r") \d{2,4}", text)
+            match = re.search(r"\d{1,2}(er)? (" + month + r") \d{2,4}", text)
             if match:
                 return parse_fr_date(match.group())
         except:
