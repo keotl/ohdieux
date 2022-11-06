@@ -17,6 +17,18 @@ be consumed in any third-party app, such as Apple Podcasts.
 3. Copiez le lien RSS généré par le site pour votre émission dans votre application de balados.
    Copy the generated RSS link into your podcasts application.
 
+## FAQ
+- Q: La requête échoue avec une erreur 504 _Gateway Time-out_! The request fails with a 504 Gateway Time-out error!
+
+  R: La conversion est encore en cours de traitement sur le
+  serveur. Ré-essayez dans quelques minutes. Puisque la réponse est mise
+  en cache lorsque terminée, les requêtes suivantes seront instantanées.
+
+  A: The request is still being processed in the background by the
+  server. Try again in a few minutes. The conversion will be cached once
+  completed, so subsequent requests should be instantaneous.
+
+
 ## Configuration avancée (pour développeurs) / Advanced Configuration (for developers)
 ### Exécution locale / Running Locally
 **Oh**dieux peut être exécuté localement depuis un environnement Python.
