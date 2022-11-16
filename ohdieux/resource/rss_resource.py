@@ -9,7 +9,7 @@ from jivago.lang.stream import Stream
 from jivago.templating.rendered_view import RenderedView
 from jivago.wsgi.annotations import Resource
 from jivago.wsgi.invocation.parameters import QueryParam, OptionalQueryParam
-from jivago.wsgi.methods import GET
+from jivago.wsgi.methods import GET, HEAD
 
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
@@ -59,3 +59,7 @@ class RssResource(object):
                                  ).toList(),
                              "now": formatdate(float(datetime.now().strftime("%s")))
                              }, content_type="text/xml")
+
+    @HEAD
+    def headers(self):
+        return ""

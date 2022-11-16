@@ -51,11 +51,13 @@ class OhdioProgrammeResponseProxy(Programme):
                         stream_id = segment["media2"]["id"]
                         if stream_id not in distinct_streams:
                             distinct_streams.append(stream_id)
-                    if self.reverse_episode_segments:
-                        distinct_streams = distinct_streams[::-1]
-
+                    episode_segments = []
                     for i, stream_id in enumerate(distinct_streams):
-                        res.append(self._map_episode(x, stream_id, index=(i + 1) if len(distinct_streams) > 1 else None))
+                        episode_segments.append(self._map_episode(x, stream_id, index=(i + 1) if len(distinct_streams) > 1 else None))
+                    if self.reverse_episode_segments:
+                        episode_segments = episode_segments[::-1]
+
+                    res.extend(episode_segments)
                 current_page += 1
             except ApiException:
                 break
