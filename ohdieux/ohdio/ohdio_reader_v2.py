@@ -72,7 +72,7 @@ class OhdioReaderV2(object):
                                                       guid=url,
                                                       date=incomplete_episode_descriptor.date,
                                                       duration=incomplete_episode_descriptor.duration,
-                                                      media=MediaDescriptor(url, "audio/mpeg",
+                                                      media=MediaDescriptor(url, incomplete_episode_descriptor.media.media_type,
                                                                             incomplete_episode_descriptor.media.length)
                                                       )
                                     ).toList())
