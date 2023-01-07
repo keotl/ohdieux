@@ -13,8 +13,6 @@ from jivago.wsgi.methods import GET, HEAD
 
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
-from ohdieux.ohdio.ohdio_reader import OhdioReader
-from ohdieux.ohdio.ohdio_reader_v2 import OhdioReaderV2
 from ohdieux.service.manifest_service import ManifestService
 
 
@@ -40,7 +38,7 @@ class RssResource(object):
         cache_entry = self._cache[(programme_id, reverse)]
         with cache_entry["lock"]:
             if (datetime.now() - cache_entry["updated"]).total_seconds() > self._cache_refresh_delay:
-                self._logger.info(f"Refreshing programme {programme_id}.")
+                self._logger.info(f"Refreshing programme {programme_id}, reverse={reverse}.")
                 start_time = datetime.now()
                 cache_entry["content"] = self.get_manifest(programme_id, reverse)
                 cache_entry["updated"] = datetime.now()
