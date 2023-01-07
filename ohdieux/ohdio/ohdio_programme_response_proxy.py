@@ -9,6 +9,7 @@ from ohdieux.model.programme_descriptor import ProgrammeDescriptor
 
 from ohdieux.ohdio.ohdio_api import ApiException, OhdioApi
 from ohdieux.util.dateparse import parse_fr_date
+from ohdieux.util.xml import unsafe_strip_tags
 
 
 class OhdioProgrammeResponseProxy(Programme):
@@ -126,7 +127,6 @@ class MediaDescriptorProxy(MediaDescriptor):
 
 
 def clean(human_readable_text: str) -> str:
-    return (human_readable_text or "") \
+    return unsafe_strip_tags(human_readable_text or "") \
         .replace("&nbsp;", " ") \
-        .replace("&", "&amp; ") \
-        .replace("<br>", "<br/>")
+        .replace("&", "&amp; ")
