@@ -69,4 +69,4 @@ class CacheEntry(Generic[T]):
         self.data = data
         self.expiry = expiry
 
-SCHEDULE_TOLERANCE = timedelta(minutes=5)
+SCHEDULE_TOLERANCE = timedelta(minutes=15)

@@ -1,3 +1,4 @@
+from datetime import datetime
 import itertools
 import logging
 import multiprocessing
@@ -76,7 +77,7 @@ class OhdioReaderV2(object):
                                                                             incomplete_episode_descriptor.media.length)
                                                       )
                                     ).toList())
-        return Programme(programme_descriptor, Stream(episodes).flat().toList())
+        return Programme(programme_descriptor, Stream(episodes).flat().toList(), datetime.utcnow())
 
 
 def _fetch_stream_url(episode_media_id: str, reverse_segments: bool) -> List[str]:

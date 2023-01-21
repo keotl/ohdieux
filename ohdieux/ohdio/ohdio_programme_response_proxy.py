@@ -20,6 +20,7 @@ class OhdioProgrammeResponseProxy(Programme):
         self._api = api
         self._episodes: Optional[List[EpisodeDescriptor]] = None
         self._programme: Optional[ProgrammeDescriptor] = None
+        self.build_date = datetime.utcnow()
 
     @property
     def programme(self) -> ProgrammeDescriptor:

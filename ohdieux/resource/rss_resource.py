@@ -1,6 +1,4 @@
 import logging
-import threading
-from datetime import datetime
 from email.utils import formatdate
 
 from jivago.lang.annotations import Inject
@@ -33,7 +31,7 @@ class RssResource(object):
                                                              MediaDescriptor(x.media.media_url, x.media.media_type,
                                                                              x.media.length))
                                  ).toList(),
-                             "now": formatdate(float(datetime.now().strftime("%s")))
+                             "now": formatdate(float(programme.build_date.strftime("%s")))
                              }, content_type="text/xml")
 
     @HEAD
