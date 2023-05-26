@@ -1,3 +1,4 @@
+from datetime import datetime
 import itertools
 import logging
 import multiprocessing
@@ -42,8 +43,8 @@ class OhdioReaderV2(object):
                 reached_end = True
 
             for item in json["content"]["contentDetail"]["items"]:
-                episode_media_ids.append(item["globalId"]["id"])
-                incomplete_episode_descriptors.append(EpisodeDescriptor(
+                try:
+                    incomplete_episode_descriptors.append(EpisodeDescriptor(
                     title=clean(item["title"]),
                     description=clean(item["summary"]),
                     guid="",
@@ -51,7 +52,11 @@ class OhdioReaderV2(object):
                     duration=item["media2"]["duration"]["durationInSeconds"],
                     media=MediaDescriptor("", "audio/mpeg",
                                           item["media2"]["duration"]["durationInSeconds"])
-                ))
+                    ))
+                    episode_media_ids.append(item["globalId"]["id"])
+                except TypeError as e:
+                    self._logger.debug("Ignoring invalid item ", item, e)
+                    continue
 
             if programme_descriptor is None:
                 programme_descriptor = ProgrammeDescriptor(
@@ -76,7 +81,7 @@ class OhdioReaderV2(object):
                                                                             incomplete_episode_descriptor.media.length)
                                                       )
                                     ).toList())
-        return Programme(programme_descriptor, Stream(episodes).flat().toList())
+        return Programme(programme_descriptor, Stream(episodes).flat().toList(), datetime.utcnow())
 
 
 def _fetch_stream_url(episode_media_id: str, reverse_segments: bool) -> List[str]:
