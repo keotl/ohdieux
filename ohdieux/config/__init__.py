@@ -25,11 +25,11 @@ class Config(object):
             env.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
             86400
 
-        self.fetch_threads = application_properties.get("FETCH_THREADS") or \
+        self.fetch_threads = int(application_properties.get("FETCH_THREADS") or \
             env.get("FETCH_THREADS") or \
             application_properties.get("FILS_REQUETES") or \
             env.get("FILS_REQUETES") or \
-            4
+            4)
 
         self.cache_strategy = application_properties.get("CACHE_STRATEGY") or \
             env.get("CACHE_STRATEGY") or \

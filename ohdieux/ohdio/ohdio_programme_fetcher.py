@@ -1,7 +1,7 @@
 import itertools
 import multiprocessing as mp
 from datetime import datetime
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Optional
 
 import requests
 from jivago.inject.annotation import Component, Singleton
@@ -31,9 +31,9 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
         programme_descriptor = ProgrammeDescriptor(
             title=summary_block.title,
             description="Ce programme est en cours de chargement par Ohdieux. "
-                        "This programme is currently being indexed by Ohdieux. "
-                        "Attendez quelques minutes avant de rafraîchir. "
-                        "Wait a few minutes before refreshing.",
+            "This programme is currently being indexed by Ohdieux. "
+            "Attendez quelques minutes avant de rafraîchir. "
+            "Wait a few minutes before refreshing.",
             author=summary_block.author,
             link=summary_block.link,
             image_url=summary_block.image_url)
@@ -50,16 +50,18 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
     def fetch_programme(self, programme_id: int) -> Programme:
         summary_block = _fetch_summary_block(programme_id)
         estimated_number_of_pages = summary_block.total_episodes // summary_block.episodes_per_page + 1
-        episode_payloads: List[dict] = list(itertools.chain(
-            *self._pool.starmap(
+        episode_payloads: List[dict] = list(
+            itertools.chain(*self._pool.starmap(
                 _fetch_page,
                 zip(itertools.repeat(programme_id),
                     range(1, estimated_number_of_pages + 1)))))  # type: ignore
 
         episode_urls = self._pool.map(_fetch_episode_streams, episode_payloads)
 
-        episode_descriptors = Stream.zip(episode_payloads, episode_urls).map(
-            _assemble_episode_descriptor).toList()  # type: ignore
+        episode_descriptors = Stream.zip(
+            episode_payloads,
+            episode_urls).map(_assemble_episode_descriptor).filter(
+                lambda x: x is not None).toList()  # type: ignore
 
         programme_descriptor = ProgrammeDescriptor(
             title=summary_block.title,
@@ -87,17 +89,23 @@ def _fetch_episode_streams(episode_payload: dict) -> List[str]:
     return _fetch_stream_url(stream_id)
 
 
-def _assemble_episode_descriptor(episode_payload: dict,
-                                 stream_urls: List[str]) -> EpisodeDescriptor:
-    return EpisodeDescriptor(
-        title=clean(episode_payload["title"]),
-        description=clean(episode_payload["summary"]),
-        guid=episode_payload["globalId"]["id"],
-        date=infer_fr_date(episode_payload),
-        duration=episode_payload["media2"]["duration"]["durationInSeconds"],
-        media=Stream(stream_urls).map(lambda x: MediaDescriptor(
-            x, "audio/mpeg", episode_payload["media2"]["duration"][
-                "durationInSeconds"])).toList())
+def _assemble_episode_descriptor(
+        episode_payload: dict,
+        stream_urls: List[str]) -> Optional[EpisodeDescriptor]:
+    try:
+        return EpisodeDescriptor(
+            title=clean(episode_payload["title"]),
+            description=clean(episode_payload["summary"]),
+            guid=episode_payload["globalId"]["id"],
+            date=infer_fr_date(episode_payload),
+            duration=episode_payload["media2"]["duration"]
+            ["durationInSeconds"],
+            media=Stream(stream_urls).map(lambda x: MediaDescriptor(
+                x, "audio/mpeg", episode_payload["media2"]["duration"][
+                    "durationInSeconds"])).toList())
+    except TypeError:
+        # broken data model, e.g. programme 3858 with empty episode
+        return None
 
 
 class ProgrammeSummary(NamedTuple):
@@ -119,7 +127,7 @@ def _fetch_summary_block(programme_id: int):
                             description=clean(json["header"]["summary"]),
                             author="Radio-Canada",
                             link="http://ici.radio-canada.ca" +
-                                 json["header"]["share"]["url"],
+                            json["header"]["share"]["url"],
                             image_url=json["header"]["picture"]["url"].replace(
                                 "{0}", "400").replace("{1}", "1x1"),
                             episodes_per_page=json["content"]["contentDetail"]
@@ -136,7 +144,7 @@ def _fetch_stream_url(episode_media_id: str) -> List[str]:
         if "contentDetail" in episode_segments["content"]:
             # Multi-segment episodes (e.g. programme 672)
             for segment in episode_segments["content"]["contentDetail"][
-                "items"]:
+                    "items"]:
                 stream_id = segment["media2"]["id"]
                 if stream_id not in distinct_streams:
                     distinct_streams.append(stream_id)
