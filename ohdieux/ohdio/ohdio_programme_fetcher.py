@@ -16,6 +16,7 @@ from ohdieux.ohdio.ohdio_programme_response_proxy import clean
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 from ohdieux.util.dateparse import infer_fr_date
 
+
 @Component
 @Singleton
 class OhdioProgrammeFetcher(ProgrammeFetchingService):
@@ -25,14 +26,35 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
         self._pool = mp.Pool(config.fetch_threads)
 
     @Override
-    def fetch_programme(self, programme_id: str) -> Programme:
+    def fetch_slim_programme(self, programme_id: int) -> Programme:
+        summary_block = _fetch_summary_block(programme_id)
+        programme_descriptor = ProgrammeDescriptor(
+            title=summary_block.title,
+            description="Ce programme est en cours de chargement par Ohdieux. "
+                        "This programme is currently being indexed by Ohdieux. "
+                        "Attendez quelques minutes avant de rafraîchir. "
+                        "Wait a few minutes before refreshing.",
+            author=summary_block.author,
+            link=summary_block.link,
+            image_url=summary_block.image_url)
+
+        return Programme(programme_descriptor, [], datetime.now())
+
+    @Override
+    def fetch_newest_episode(self, programme_id: int) -> EpisodeDescriptor:
+        page = _fetch_page(programme_id, 1)
+        episode_urls = _fetch_episode_streams(page[0])
+        return _assemble_episode_descriptor(page[0], episode_urls)
+
+    @Override
+    def fetch_programme(self, programme_id: int) -> Programme:
         summary_block = _fetch_summary_block(programme_id)
         estimated_number_of_pages = summary_block.total_episodes // summary_block.episodes_per_page + 1
-        episode_payloads: List[dict] = itertools.chain(
-            self._pool.starmap(
+        episode_payloads: List[dict] = list(itertools.chain(
+            *self._pool.starmap(
                 _fetch_page,
                 zip(itertools.repeat(programme_id),
-                    range(1, estimated_number_of_pages + 1))))  # type: ignore
+                    range(1, estimated_number_of_pages + 1)))))  # type: ignore
 
         episode_urls = self._pool.map(_fetch_episode_streams, episode_payloads)
 
@@ -50,7 +72,7 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
                          datetime.now())
 
 
-def _fetch_page(programme_id: str, page_number: int) -> List[dict]:
+def _fetch_page(programme_id: int, page_number: int) -> List[dict]:
     response = requests.get(
         f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/{page_number}"
     )
@@ -88,7 +110,7 @@ class ProgrammeSummary(NamedTuple):
     total_episodes: int
 
 
-def _fetch_summary_block(programme_id: str):
+def _fetch_summary_block(programme_id: int):
     response = requests.get(
         f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/1"
     )
@@ -97,7 +119,7 @@ def _fetch_summary_block(programme_id: str):
                             description=clean(json["header"]["summary"]),
                             author="Radio-Canada",
                             link="http://ici.radio-canada.ca" +
-                            json["header"]["share"]["url"],
+                                 json["header"]["share"]["url"],
                             image_url=json["header"]["picture"]["url"].replace(
                                 "{0}", "400").replace("{1}", "1x1"),
                             episodes_per_page=json["content"]["contentDetail"]
@@ -114,7 +136,7 @@ def _fetch_stream_url(episode_media_id: str) -> List[str]:
         if "contentDetail" in episode_segments["content"]:
             # Multi-segment episodes (e.g. programme 672)
             for segment in episode_segments["content"]["contentDetail"][
-                    "items"]:
+                "items"]:
                 stream_id = segment["media2"]["id"]
                 if stream_id not in distinct_streams:
                     distinct_streams.append(stream_id)
