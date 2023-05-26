@@ -1,16 +1,11 @@
 from datetime import datetime
-from typing import NamedTuple
+from typing import List, NamedTuple
 
-class MediaDescriptor(object):
+
+class MediaDescriptor(NamedTuple):
     media_url: str
     media_type: str
     length: int
-
-    def __init__(self, media_url: str, media_type: str, length: int):
-        self.media_url = media_url
-        self.media_type = media_type
-        self.length = length
-        
 
 
 class EpisodeDescriptor(NamedTuple):
@@ -19,4 +14,4 @@ class EpisodeDescriptor(NamedTuple):
     guid: str
     date: datetime
     duration: int
-    media: MediaDescriptor
+    media: List[MediaDescriptor]
