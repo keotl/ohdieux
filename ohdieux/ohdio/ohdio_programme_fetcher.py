@@ -13,7 +13,8 @@ from ohdieux.model.programme import Programme
 from ohdieux.model.programme_descriptor import ProgrammeDescriptor
 from ohdieux.ohdio.ohdio_api import OhdioApi
 from ohdieux.ohdio.ohdio_programme_response_proxy import clean
-from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
+from ohdieux.service.programme_fetching_service import (
+    ProgrammeFetchingService, ProgrammeNotFoundException)
 from ohdieux.util.dateparse import infer_fr_date
 
 
@@ -124,6 +125,9 @@ def _fetch_summary_block(programme_id: int):
     response = requests.get(
         f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/1"
     )
+    if not response.ok:
+        raise ProgrammeNotFoundException(programme_id)
+
     json = response.json()
     return ProgrammeSummary(title=clean(json["header"]["title"]),
                             description=clean(json["header"]["summary"]),

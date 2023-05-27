@@ -18,3 +18,7 @@ class ProgrammeFetchingService(object):
     @abc.abstractmethod
     def fetch_newest_episode(self, programme_id: int) -> EpisodeDescriptor:
         raise NotImplementedError
+
+
+class ProgrammeNotFoundException(Exception):
+    pass

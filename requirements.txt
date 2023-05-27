@@ -14,3 +14,6 @@ six==1.16.0
 urllib3==1.26.10
 Werkzeug==2.1.2
 pytz
+async-timeout==4.0.2
+hiredis==2.2.3
+redis==4.5.5

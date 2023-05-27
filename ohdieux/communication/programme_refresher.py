@@ -7,12 +7,13 @@ from jivago.event.config.annotations import EventHandler, EventHandlerClass
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 from ohdieux.caching.programme_cache import ProgrammeCache
-from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
+from ohdieux.service.programme_fetching_service import (
+    ProgrammeFetchingService, ProgrammeNotFoundException)
 
 
 @Component
 @EventHandlerClass
-class InProcessProgrammeRefresher(object):
+class ProgrammeRefresher(object):
 
     @Inject
     def __init__(self, fetcher: ProgrammeFetchingService,
@@ -32,6 +33,9 @@ class InProcessProgrammeRefresher(object):
             self._logger.info(
                 f"Done refreshing programme {programme_id} in {datetime.now() - start}."
             )
+        except ProgrammeNotFoundException:
+            self._logger.info(
+                f"Could not find programme {programme_id}. Ignoring.")
         except KeyboardInterrupt as e:
             raise e
         except Exception:

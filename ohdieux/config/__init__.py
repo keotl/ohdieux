@@ -13,7 +13,7 @@ from jivago.lang.annotations import Inject
 class Config(object):
     cache_refresh_delay_s: int
     fetch_threads: int
-    cache_strategy: Literal["memory", "mongodb"]
+    cache_strategy: Literal["memory", "redis"]
 
     @Inject
     def __init__(self, application_properties: ApplicationProperties,
