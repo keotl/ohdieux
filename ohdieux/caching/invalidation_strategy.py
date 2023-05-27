@@ -35,7 +35,9 @@ class InvalidationStrategy(object):
 
     def _check_stale(self, programme_id: int, programme: Programme) -> bool:
         newest_episode = self._fetcher.fetch_newest_episode(programme_id)
-
+        if newest_episode is None:
+            # Some transient error most likely. Let's wait.
+            stale = False
         if len(programme.episodes) == 0:
             stale = True
         elif len(programme.episodes) > 0:

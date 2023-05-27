@@ -29,7 +29,6 @@ class InProcessProgrammeRefresher(object):
             start = datetime.now()
             programme = self._fetcher.fetch_programme(programme_id)
             self._cache.set(programme_id, programme)
-            self._bus.emit("refresh_complete", programme_id)
             self._logger.info(
                 f"Done refreshing programme {programme_id} in {datetime.now() - start}."
             )
@@ -39,3 +38,5 @@ class InProcessProgrammeRefresher(object):
             self._logger.error(
                 f"Uncaught exception while refreshing programme {tb.format_exc()}."
             )
+        finally:
+            self._bus.emit("refresh_complete", programme_id)

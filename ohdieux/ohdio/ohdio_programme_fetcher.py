@@ -103,6 +103,8 @@ def _assemble_episode_descriptor(
             media=Stream(stream_urls).map(lambda x: MediaDescriptor(
                 x, "audio/mpeg", episode_payload["media2"]["duration"][
                     "durationInSeconds"])).toList())
+    except AttributeError:
+        return None
     except TypeError:
         # broken data model, e.g. programme 3858 with empty episode
         return None
