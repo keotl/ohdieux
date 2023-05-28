@@ -1,5 +1,5 @@
 import itertools
-import multiprocessing as mp
+import multiprocessing.pool
 from datetime import datetime
 from typing import List, NamedTuple, Optional
 
@@ -12,7 +12,7 @@ from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
 from ohdieux.model.programme import Programme
 from ohdieux.model.programme_descriptor import ProgrammeDescriptor
 from ohdieux.ohdio.ohdio_api import OhdioApi
-from ohdieux.ohdio.ohdio_programme_response_proxy import clean
+from ohdieux.ohdio.parse_utils import clean
 from ohdieux.service.programme_fetching_service import (
     ProgrammeFetchingService, ProgrammeNotFoundException)
 from ohdieux.util.dateparse import infer_fr_date
@@ -24,7 +24,7 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
 
     @Inject
     def __init__(self, config: Config):
-        self._pool = mp.Pool(config.fetch_threads)
+        self._pool = multiprocessing.Pool(config.fetch_threads)
 
     @Override
     def fetch_slim_programme(self, programme_id: int) -> Programme:
@@ -165,9 +165,8 @@ def _fetch_stream_url(episode_media_id: str) -> List[str]:
         res = requests.get(
             f"https://services.radio-canada.ca/media/validation/v2/?appCode=medianet&connectionType=hd&deviceType=ipad&idMedia={media_id}&multibitrate=true&output=json&tech=hls"
         )
-        if not res.ok:
-            urls.append("")
-
+        if not res.ok or res.json()["url"] is None:
+            continue
         urls.append(res.json()["url"])
 
     return urls

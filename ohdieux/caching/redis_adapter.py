@@ -55,6 +55,7 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
                 return None
             return self._mapper.deserialize(value.decode("utf-8"), Programme)
         except IncorrectAttributeTypeException:
+            self._logger.error(f"Deserialization error while reading programme {programme_id} from cache.")
             return None
 
     @Override

@@ -38,7 +38,7 @@ class InvalidationStrategy(object):
         self._logger.info(f"Checking staleness for programme {programme_id}.")
         newest_episode = self._fetcher.fetch_newest_episode(programme_id)
         if newest_episode is None:
-            # Some transient error most likely. Let's wait.
+            # Likely some transient error. Let's wait.
             stale = False
         elif len(programme.episodes) == 0:
             stale = True

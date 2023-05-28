@@ -2,10 +2,11 @@ import logging
 import traceback as tb
 from datetime import datetime
 
-from jivago.event.async_event_bus import AsyncEventBus
 from jivago.event.config.annotations import EventHandler, EventHandlerClass
+from jivago.event.synchronous_event_bus import SynchronousEventBus
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
+
 from ohdieux.caching.invalidation_strategy import InvalidationStrategy
 from ohdieux.caching.programme_cache import ProgrammeCache
 from ohdieux.service.programme_fetching_service import (
@@ -18,7 +19,7 @@ class ProgrammeRefresher(object):
 
     @Inject
     def __init__(self, fetcher: ProgrammeFetchingService,
-                 cache: ProgrammeCache, event_bus: AsyncEventBus,
+                 cache: ProgrammeCache, event_bus: SynchronousEventBus,
                  invalidation_strategy: InvalidationStrategy):
         self._fetcher = fetcher
         self._cache = cache
