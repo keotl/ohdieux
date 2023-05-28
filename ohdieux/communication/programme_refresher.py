@@ -6,6 +6,7 @@ from jivago.event.async_event_bus import AsyncEventBus
 from jivago.event.config.annotations import EventHandler, EventHandlerClass
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
+from ohdieux.caching.invalidation_strategy import InvalidationStrategy
 from ohdieux.caching.programme_cache import ProgrammeCache
 from ohdieux.service.programme_fetching_service import (
     ProgrammeFetchingService, ProgrammeNotFoundException)
@@ -17,15 +18,20 @@ class ProgrammeRefresher(object):
 
     @Inject
     def __init__(self, fetcher: ProgrammeFetchingService,
-                 cache: ProgrammeCache, event_bus: AsyncEventBus):
+                 cache: ProgrammeCache, event_bus: AsyncEventBus,
+                 invalidation_strategy: InvalidationStrategy):
         self._fetcher = fetcher
         self._cache = cache
         self._bus = event_bus
+        self._invalidation = invalidation_strategy
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @EventHandler("refresh_programme")
     def do_refresh(self, programme_id: int):
         try:
+            if not self._invalidation.should_refresh(
+                    programme_id, self._cache.get(programme_id)):
+                return
             self._logger.info(f"Refreshing programme {programme_id}.")
             start = datetime.now()
             programme = self._fetcher.fetch_programme(programme_id)

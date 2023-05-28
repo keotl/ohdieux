@@ -1,16 +1,15 @@
 import logging
+import time
 from typing import List, Optional
 
 import redis
 from jivago.config.properties.system_environment_properties import \
     SystemEnvironmentProperties
-from jivago.config.startup_hooks import PostInit
-from jivago.event.config.annotations import EventHandler, EventHandlerClass
+from jivago.event.config.annotations import EventHandler
 from jivago.event.synchronous_event_bus import SynchronousEventBus
 from jivago.inject.annotation import Component, Singleton
-from jivago.lang.annotations import BackgroundWorker, Inject, Override
+from jivago.lang.annotations import Inject, Override
 from jivago.lang.runnable import Runnable
-from jivago.scheduling.annotations import Duration, Scheduled
 from jivago.serialization.object_mapper import ObjectMapper
 from jivago.wsgi.invocation.incorrect_attribute_type_exception import \
     IncorrectAttributeTypeException
@@ -22,7 +21,7 @@ from ohdieux.model.programme import Programme
 
 @Component
 @Singleton
-@EventHandlerClass
+# @EventHandlerClass # Configured conditionally in context.py
 class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
 
     @Inject
@@ -36,7 +35,7 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
             raise Exception(f"Missing REDIS_URL environment variable.")
 
         self._connection = redis.StrictRedis(decode_responses=True,
-                                             health_check_interval=30,
+                                             health_check_interval=5,
                                              charset="utf-8").from_url(
                                                  self._url)
         self._connection.ping()
@@ -92,7 +91,8 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
 
 
 @Component
-@BackgroundWorker
+# Registered conditionally from context.py
+# @BackgroundWorker
 class RedisRefreshListener(Runnable):
 
     @Inject
@@ -100,29 +100,41 @@ class RedisRefreshListener(Runnable):
         self._redis = redis
         self._pubsub = self._redis._connection.pubsub()
         self._event_bus = event_bus
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     @Override
     def run(self):
-        self._pubsub.subscribe("refresh_programme")
-        for message in self._pubsub.listen():
-            if message is None:
+        while True:
+            try:
+                self._pubsub.subscribe("refresh_programme")
+                for message in self._pubsub.listen():
+                    if message is None:
+                        continue
+                    programme_id = int(message.get("data"))
+                    if self._redis._mark_pending_and_should_send_refresh_message(
+                            programme_id):
+                        self._event_bus.emit("refresh_programme", programme_id)
+            except redis.exceptions.RedisError as e:
+                self._logger.warning(f"Redis connection closed. Restarting listener in 10 seconds... {e}")
+                time.sleep(10)
                 continue
-            programme_id = int(message.get("data"))
-            if self._redis._mark_pending_and_should_send_refresh_message(
-                    programme_id):
-                self._event_bus.emit("refresh_programme", programme_id)
 
 
 @Component
-@PostInit
-@Scheduled(every=Duration.DAY)
+# Registered conditionally from context.py
+# @PostInit
+# @Scheduled(every=Duration.DAY)
 class RedisPendingQueueJanitor(Runnable):
 
     @Inject
     def __init__(self, redis: RedisAdapter):
         self._redis = redis
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     @Override
     def run(self):
         with self._redis._connection.lock("pending_lock"):
+            self._logger.info(
+                "Clearing pending programmes in case there are stray elements."
+            )
             self._redis._connection.delete("pending")

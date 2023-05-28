@@ -25,8 +25,7 @@ class ManifestService(object):
     def generate_podcast_manifest(self, programme_id: int,
                                   reverse_segments: bool) -> Programme:
         programme = self._cache.get(programme_id)
-        if programme is None or self._invalidation.should_refresh(
-                programme_id, programme):
+        if self._invalidation.should_refresh(programme_id, programme):
             self._refresh.notify_refresh(programme_id)
 
         if programme is None:
