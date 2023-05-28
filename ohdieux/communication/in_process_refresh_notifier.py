@@ -4,6 +4,7 @@ from jivago.event.async_event_bus import AsyncEventBus
 from jivago.event.config.annotations import EventHandler
 from jivago.inject.annotation import Singleton
 from jivago.lang.annotations import Inject, Override
+
 from ohdieux.communication.programme_refresh_notifier import \
     ProgrammeRefreshNotifier
 

@@ -44,8 +44,6 @@ class Context(ProductionJivagoContext):
     def configure_service_locator(self):
         self.service_locator().bind(ProgrammeFetchingService,
                                     OhdioProgrammeFetcher)
-        self.service_locator().bind(ProgrammeRefreshNotifier,
-                                    InProcessRefreshNotifier)
         return super().configure_service_locator()
 
 

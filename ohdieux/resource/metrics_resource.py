@@ -1,8 +1,11 @@
+import json
+
 from jivago.lang.annotations import Inject
 from jivago.wsgi.annotations import Resource
 from jivago.wsgi.methods import GET
 from ohdieux.caching.inmemory_programme_cache import InmemoryProgrammeCache
 from ohdieux.caching.programme_cache import ProgrammeCache
+from ohdieux.caching.redis_adapter import RedisAdapter
 from ohdieux.communication.in_process_refresh_notifier import \
     InProcessRefreshNotifier
 from ohdieux.communication.programme_refresh_notifier import \
@@ -28,4 +31,8 @@ class MetricsResource(object):
                 programme_id: p.build_date
                 for programme_id, p in self._cache._content.items()
             }
+        if isinstance(self._notifier, RedisAdapter):
+            res["pending"] = json.loads(
+                (self._notifier._connection.get("pending")
+                 or b"[]").decode("utf-8"))
         return res
