@@ -70,8 +70,9 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
             else:
                 pending = self._mapper.deserialize(saved.decode("utf-8"),
                                                    List[int])
-            pending.remove(programme_id)
-            self._connection.set("pending", self._mapper.serialize(pending))
+            if programme_id in pending:
+                pending.remove(programme_id)
+                self._connection.set("pending", self._mapper.serialize(pending))
 
     def _mark_pending_and_should_send_refresh_message(
             self, programme_id: int) -> bool:
