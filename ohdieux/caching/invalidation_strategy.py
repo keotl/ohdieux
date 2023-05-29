@@ -49,7 +49,7 @@ class InvalidationStrategy(object):
                 0].media[0].media_url
         else:
             self._logger.warning(
-                f"Reached fallback case for staleness checker for programme {programme_id}. {programme.__dict__}, {newest_episode.__dict__}"
+                f"Reached fallback case for staleness checker for programme {programme_id}. {programme}, {newest_episode}"
             )
             stale = False
 

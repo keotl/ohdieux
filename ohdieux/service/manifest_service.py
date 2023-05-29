@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 from ohdieux.caching.invalidation_strategy import InvalidationStrategy
@@ -7,6 +9,11 @@ from ohdieux.communication.programme_refresh_notifier import \
 from ohdieux.model.programme import Programme
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 from ohdieux.transform.reverse_episode_segments import reverse_episode_segments
+
+
+class ProgrammeResponse(NamedTuple):
+    programme: Programme
+    should_cache: bool
 
 
 @Component
@@ -23,14 +30,17 @@ class ManifestService(object):
         self._fetcher = fetcher
 
     def generate_podcast_manifest(self, programme_id: int,
-                                  reverse_segments: bool) -> Programme:
+                                  reverse_segments: bool) -> ProgrammeResponse:
         programme = self._cache.get(programme_id)
+        should_cache = True
         if self._invalidation.should_refresh(programme_id, programme):
             self._refresh.notify_refresh(programme_id)
 
         if programme is None:
             programme = self._fetcher.fetch_slim_programme(programme_id)
+            should_cache = False
 
         if reverse_segments:
-            return reverse_episode_segments(programme)
-        return programme
+            programme = reverse_episode_segments(programme)
+
+        return ProgrammeResponse(programme, should_cache)
