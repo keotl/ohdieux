@@ -2,11 +2,12 @@ FROM python:3.10-alpine
 
 WORKDIR /app
 RUN apk add git
-COPY ohdieux /app/ohdieux
-COPY requirements.txt /app
-COPY main.py /app
 
+COPY requirements.txt /app
 RUN pip3 install -r requirements.txt
+
+COPY main.py /app
+COPY ohdieux /app/ohdieux
 
 ENV PYTHONPATH /app
 
