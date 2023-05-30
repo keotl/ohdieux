@@ -53,5 +53,7 @@ class InvalidationStrategy(object):
             )
             stale = False
 
-        self._debouncer.set_last_checked_time(programme_id)
+        if not stale:
+            self._debouncer.set_last_checked_time(programme_id)
+
         return stale
