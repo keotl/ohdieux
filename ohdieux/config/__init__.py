@@ -18,12 +18,11 @@ class Config(object):
     @Inject
     def __init__(self, application_properties: ApplicationProperties,
                  env: SystemEnvironmentProperties):
-        self.cache_refresh_delay_s = \
-            application_properties.get("CACHE_REFRESH_DELAY") or \
+        self.cache_refresh_delay_s = int(application_properties.get("CACHE_REFRESH_DELAY") or \
             env.get("CACHE_REFRESH_DELAY") or \
             application_properties.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
             env.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
-            86400
+            86400)
 
         self.fetch_threads = int(application_properties.get("FETCH_THREADS") or \
             env.get("FETCH_THREADS") or \

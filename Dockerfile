@@ -16,4 +16,4 @@ RUN adduser app -G nobody -u 2000 -D -H
 USER app:nobody
 
 EXPOSE 8080
-CMD ["gunicorn", "--workers=1", "--threads=8","--timeout=10","--bind=0.0.0.0:8080", "main"]
+CMD ["sh", "-c", "gunicorn --workers=${GUNICORN_WORKERS:-1} --threads=${GUNICORN_THREADS:-4} --timeout=10 --bind=0.0.0.0:${PORT:-8080} main"]
