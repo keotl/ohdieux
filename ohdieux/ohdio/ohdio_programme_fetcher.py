@@ -42,10 +42,13 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
         return Programme(programme_descriptor, [], datetime.now())
 
     @Override
-    def fetch_newest_episode(self, programme_id: int) -> EpisodeDescriptor:
+    def fetch_newest_episode(self, programme_id: int) -> Optional[EpisodeDescriptor]:
         page = _fetch_page(programme_id, 1)
-        episode_urls = _fetch_episode_streams(page[0])
-        return _assemble_episode_descriptor(page[0], episode_urls)
+        if page:
+            episode_urls = _fetch_episode_streams(page[0])
+            return _assemble_episode_descriptor(page[0], episode_urls)
+        # Programmes with no episodes, e.g. 7220
+        return None
 
     @Override
     def fetch_programme(self, programme_id: int) -> Programme:
