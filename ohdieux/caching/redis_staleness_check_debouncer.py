@@ -1,0 +1,33 @@
+from datetime import datetime, timedelta
+
+from jivago.inject.annotation import Component
+from jivago.lang.annotations import Inject, Override
+from ohdieux.caching.redis_adapter import RedisAdapter
+from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
+
+
+@Component
+class RedisStalenessCheckDebouncer(StalenessCheckDebouncer):
+
+    @Inject
+    def __init__(self, redis: RedisAdapter):
+        self._redis = redis
+        self._check_delay = timedelta(minutes=5)
+
+    @Override
+    def set_last_checked_time(self, programme_id: int):
+        self._redis._connection.set(f"last_checked_{programme_id}",
+                                    datetime.now().isoformat())
+
+    @Override
+    def should_check_again(self, programme_id: int) -> bool:
+        saved = self._redis._connection.get(f"last_checked_{programme_id}")
+        if saved is None:
+            return True
+        try:
+            return datetime.now() > datetime.fromisoformat(
+                saved.decode("utf-8")) + self._check_delay
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception as e:
+            return True
