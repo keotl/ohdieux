@@ -1,5 +1,6 @@
 import itertools
 import multiprocessing.pool
+import os
 from datetime import datetime
 from typing import List, NamedTuple, Optional
 
@@ -16,6 +17,11 @@ from ohdieux.ohdio.parse_utils import clean
 from ohdieux.service.programme_fetching_service import (
     ProgrammeFetchingService, ProgrammeNotFoundException)
 from ohdieux.util.dateparse import infer_fr_date
+
+if os.environ.get("USER_AGENT"):
+    USER_AGENT = {"User-Agent": os.environ.get("USER_AGENT") or ""}
+else:
+    USER_AGENT = None
 
 
 @Component
@@ -42,7 +48,8 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
         return Programme(programme_descriptor, [], datetime.now())
 
     @Override
-    def fetch_newest_episode(self, programme_id: int) -> Optional[EpisodeDescriptor]:
+    def fetch_newest_episode(self,
+                             programme_id: int) -> Optional[EpisodeDescriptor]:
         page = _fetch_page(programme_id, 1)
         if page:
             episode_urls = _fetch_episode_streams(page[0])
@@ -80,8 +87,8 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
 
 def _fetch_page(programme_id: int, page_number: int) -> List[dict]:
     response = requests.get(
-        f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/{page_number}"
-    )
+        f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/{page_number}",
+        headers=USER_AGENT)
     if not response.ok:
         return []
     json = response.json()
@@ -126,8 +133,8 @@ class ProgrammeSummary(NamedTuple):
 
 def _fetch_summary_block(programme_id: int):
     response = requests.get(
-        f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/1"
-    )
+        f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programme_id}/1",
+        headers=USER_AGENT)
     if not response.ok:
         raise ProgrammeNotFoundException(programme_id)
 
@@ -166,8 +173,8 @@ def _fetch_stream_url(episode_media_id: str) -> List[str]:
     urls: List[str] = []
     for media_id in segments:
         res = requests.get(
-            f"https://services.radio-canada.ca/media/validation/v2/?appCode=medianet&connectionType=hd&deviceType=ipad&idMedia={media_id}&multibitrate=true&output=json&tech=hls"
-        )
+            f"https://services.radio-canada.ca/media/validation/v2/?appCode=medianet&connectionType=hd&deviceType=ipad&idMedia={media_id}&multibitrate=true&output=json&tech=progressive",
+            headers=USER_AGENT)
         if not res.ok or res.json()["url"] is None:
             continue
         urls.append(res.json()["url"])
