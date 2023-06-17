@@ -84,7 +84,7 @@ def render_episode(episode: EpisodeDescriptor,
         res.append(
             RenderedEpisode(title=title,
                             description=episode.description,
-                            guid=stream.media_url,
+                            guid=f"{episode.guid}_{i}",
                             date=formatdate(float(
                                 episode.date.strftime("%s"))),
                             duration=episode.duration,
