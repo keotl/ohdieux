@@ -64,7 +64,7 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
 
     @EventHandler("refresh_complete")
     def on_refresh_complete(self, programme_id: int):
-        with self._connection.lock("pending_lock"):
+        with self._connection.lock("pending_lock", timeout=5):
             saved = self._connection.get("pending")
             if saved is None:
                 pending = []
@@ -77,7 +77,7 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
 
     def _mark_pending_and_should_send_refresh_message(
             self, programme_id: int) -> bool:
-        with self._connection.lock("pending_lock"):
+        with self._connection.lock("pending_lock", timeout=5):
             saved = self._connection.get("pending")
             if saved is None:
                 pending = []
@@ -135,7 +135,7 @@ class RedisPendingQueueJanitor(Runnable):
 
     @Override
     def run(self):
-        with self._redis._connection.lock("pending_lock"):
+        with self._redis._connection.lock("pending_lock", timeout=5):
             self._logger.info(
                 "Clearing pending programmes in case there are stray elements."
             )
