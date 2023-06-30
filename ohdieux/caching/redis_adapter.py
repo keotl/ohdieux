@@ -1,6 +1,7 @@
 import logging
 import time
 from typing import List, Optional
+import traceback
 
 import redis
 from jivago.config.properties.system_environment_properties import \
@@ -118,6 +119,10 @@ class RedisRefreshListener(Runnable):
                         self._event_bus.emit("refresh_programme", programme_id)
             except redis.exceptions.RedisError as e:
                 self._logger.warning(f"Redis connection closed. Restarting listener in 10 seconds... {e}")
+                time.sleep(10)
+                continue
+            except Exception as e:
+                self._logger.error(f"Uncaught exception in redis listener. Restarting in 10 seconds...", traceback.format_exc())
                 time.sleep(10)
                 continue
 

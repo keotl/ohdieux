@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import traceback
 
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject, Override
@@ -30,4 +31,5 @@ class RedisStalenessCheckDebouncer(StalenessCheckDebouncer):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
+            traceback.print_exc()
             return True
