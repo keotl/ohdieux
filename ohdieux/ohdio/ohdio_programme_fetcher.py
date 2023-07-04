@@ -172,11 +172,15 @@ def _fetch_stream_url(episode_media_id: str) -> List[str]:
         segments = [episode_media_id]
     urls: List[str] = []
     for media_id in segments:
-        res = requests.get(
-            f"https://services.radio-canada.ca/media/validation/v2/?appCode=medianet&connectionType=hd&deviceType=ipad&idMedia={media_id}&multibitrate=true&output=json&tech=progressive",
-            headers=USER_AGENT)
-        if not res.ok or res.json()["url"] is None:
-            continue
-        urls.append(res.json()["url"])
+        for platform in ["progressive", "hls"]:
+            # Some programmes only work with HLS, e.g. 8362
+            res = requests.get(
+                f"https://services.radio-canada.ca/media/validation/v2/?appCode=medianet&connectionType=hd&deviceType=ipad&idMedia={media_id}&multibitrate=true&output=json&tech={platform}",
+                headers=USER_AGENT)
+            if not res.ok or res.json()["url"] is None:
+                continue
+
+            urls.append(res.json()["url"])
+            break
 
     return urls
