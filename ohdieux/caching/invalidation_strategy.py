@@ -6,6 +6,7 @@ from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
 from ohdieux.config import Config
+from ohdieux.model.episode_descriptor import EpisodeDescriptor
 from ohdieux.model.programme import Programme
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 
@@ -42,18 +43,23 @@ class InvalidationStrategy(object):
             stale = False
         elif len(programme.episodes) == 0:
             stale = True
-        elif (len(programme.episodes) > 0
-              and len(programme.episodes[0].media) > 0
-              and len(newest_episode.media) > 0):
-            stale = newest_episode.media[0].media_url != programme.episodes[
-                0].media[0].media_url
         else:
-            self._logger.warning(
-                f"Reached fallback case for staleness checker for programme {programme_id}. {programme}, {newest_episode}"
-            )
-            stale = False
+            stale = _first_url(newest_episode) != _first_url(
+                programme.episodes[0])
+            if not _first_url(newest_episode):
+                self._logger.warning(
+                    f"Got no URL for newest episode {programme_id} {newest_episode}.")
 
         if not stale:
             self._debouncer.set_last_checked_time(programme_id)
 
         return stale
+
+
+def _first_url(episode: Optional[EpisodeDescriptor]) -> str:
+    if episode is None:
+        return ""
+    if not episode.media:
+        return ""
+
+    return episode.media[0].media_url
