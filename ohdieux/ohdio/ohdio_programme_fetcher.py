@@ -145,7 +145,7 @@ def _fetch_summary_block(programme_id: int):
                             link="http://ici.radio-canada.ca" +
                             json["header"]["share"]["url"],
                             image_url=json["header"]["picture"]["url"].replace(
-                                "{0}", "400").replace("{1}", "1x1"),
+                                "{0}", "1400").replace("{1}", "1x1"),
                             episodes_per_page=json["content"]["contentDetail"]
                             ["pagedConfiguration"]["pageMaxLength"],
                             total_episodes=json["content"]["contentDetail"]
