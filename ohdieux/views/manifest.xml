@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
   <channel>
     <copyright></copyright>
     <description>
@@ -15,7 +16,8 @@
     <lastBuildDate>{{now}}</lastBuildDate>
     <title>{{programme.title}}</title>
     <itunes:explicit>clean</itunes:explicit>
-    <image>
+    <itunes:category text="News"/>
+     <image>
       <url>{{programme.image_url}}</url>
       <title>{{programme.title}}</title>
       <link>{{programme.link}}</link>
@@ -32,7 +34,6 @@
       <guid>{{episode.guid}}</guid>
       <itunes:author>{{programme.author}}</itunes:author>
       <itunes:duration>{{episode.duration}}</itunes:duration>
-      <!-- <itunes:category text="News &amp; Politics"/> -->
       <itunes:explicit>clean</itunes:explicit>
       <pubDate>{{episode.date}}</pubDate>
     </item>
