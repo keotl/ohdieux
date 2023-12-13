@@ -1,6 +1,5 @@
 import logging
 from email.utils import formatdate
-from typing import List, NamedTuple
 
 from jivago.lang.annotations import Inject
 from jivago.lang.stream import Stream
@@ -10,8 +9,9 @@ from jivago.wsgi.invocation.parameters import OptionalQueryParam, QueryParam
 from jivago.wsgi.methods import GET, HEAD
 from jivago.wsgi.request.request import Request
 from jivago.wsgi.request.response import Response
-from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
+from ohdieux.resource.rendering.episode_renderer import renderer
 from ohdieux.service.manifest_service import ManifestService
+from ohdieux.util.query_params import parse_bool
 
 
 @Resource("/rss")
@@ -25,21 +25,25 @@ class RssResource(object):
     @GET
     def get_manifest(self, programme_id: QueryParam[int],
                      reverse: OptionalQueryParam[str],
-                     tag_segments: OptionalQueryParam[str], request: Request):
-        _reverse = reverse in ("t", "true", "True", "1", "yes", "y")
-        _tag_segments = tag_segments in ("t", "true", "True", "1", "y", "yes")
+                     tag_segments: OptionalQueryParam[str],
+                     favor_aac: OptionalQueryParam[str], request: Request):
+        _reverse = parse_bool(reverse)
+        _tag_segments = parse_bool(tag_segments)
+        _favor_aac = parse_bool(favor_aac)
 
         self._logger.info(
             f"GET /rss?programme_id={programme_id} {request.headers['User-Agent']}"
         )
 
         programme_response = self._manifest_service.generate_podcast_manifest(
-            int(str(programme_id)), _reverse)
+            int(str(programme_id)))
         programme = programme_response.programme
 
-        rendered_episodes = Stream(
-            programme.episodes).map(lambda e: render_episode(
-                e, tag_segments=_tag_segments)).flat().toList()  # type: ignore
+        rendered_episodes = Stream(programme.episodes).map(
+            renderer(
+                tag_segments=_tag_segments,
+                favor_aac=_favor_aac,
+                reverse_segments=_reverse)).flat().toList()  # type: ignore
         body = RenderedView(
             "manifest.xml", {
                 "programme": programme.programme,
@@ -60,33 +64,7 @@ def _response_headers(should_cache: bool) -> dict:
     if not should_cache:
         return {"Cache-Control": "no-cache"}
 
-    return {"Cache-Control": "max-age=240, stale-while-revalidate=60, stale-if-error=86400"}
-
-
-class RenderedEpisode(NamedTuple):
-    title: str
-    description: str
-    guid: str
-    date: str
-    duration: int
-    media: MediaDescriptor
-
-
-def render_episode(episode: EpisodeDescriptor,
-                   *,
-                   tag_segments: bool = False) -> List[RenderedEpisode]:
-    res = []
-    for i, stream in enumerate(episode.media):
-        if tag_segments:
-            title = f"{episode.title} ({i + 1})"
-        else:
-            title = episode.title
-        res.append(
-            RenderedEpisode(title=title,
-                            description=episode.description,
-                            guid=f"{episode.guid}_{i}",
-                            date=formatdate(float(
-                                episode.date.strftime("%s"))),
-                            duration=episode.duration,
-                            media=stream))
-    return res
+    return {
+        "Cache-Control":
+        "max-age=240, stale-while-revalidate=60, stale-if-error=86400"
+    }

@@ -8,7 +8,6 @@ from ohdieux.communication.programme_refresh_notifier import \
     ProgrammeRefreshNotifier
 from ohdieux.model.programme import Programme
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
-from ohdieux.transform.reverse_episode_segments import reverse_episode_segments
 
 
 class ProgrammeResponse(NamedTuple):
@@ -29,8 +28,8 @@ class ManifestService(object):
         self._refresh = refresh
         self._fetcher = fetcher
 
-    def generate_podcast_manifest(self, programme_id: int,
-                                  reverse_segments: bool) -> ProgrammeResponse:
+    def generate_podcast_manifest(self,
+                                  programme_id: int) -> ProgrammeResponse:
         programme = self._cache.get(programme_id)
         should_cache = True
         if self._invalidation.should_refresh(programme_id, programme):
@@ -39,8 +38,5 @@ class ManifestService(object):
         if programme is None:
             programme = self._fetcher.fetch_slim_programme(programme_id)
             should_cache = False
-
-        if reverse_segments:
-            programme = reverse_episode_segments(programme)
 
         return ProgrammeResponse(programme, should_cache)

@@ -33,14 +33,27 @@
       time. Retry the URL after a few minutes.
     </p>
 
-    <input id="programme_id" />
-    <button id="submit">Soumettre / Submit</button>
-    <input type="checkbox" id="reverse" /><label for="reverse"
-      >Inverser ordre segments / Reverse segment ordering
-    </label>
-        <input type="checkbox" id="tag_segments" /><label for="tag_segments"
-      >Numéroter segments / Tag segment numbers
-    </label>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <input id="programme_id" />
+      <button id="submit">Soumettre / Submit</button>
+      <div style="display: flex; flex-direction: column">
+        <div>
+          <input type="checkbox" id="reverse" /><label for="reverse"
+            >Inverser ordre segments / Reverse segment ordering
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" id="tag_segments" /><label for="tag_segments"
+            >Numéroter segments / Tag segment numbers
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" id="favor_aac" /><label for="favor_aac"
+            >Préférer AAC (expérimental) / Prefer AAC (experimental)
+          </label>
+        </div>
+      </div>
+    </div>
     <br />
     <a id="rss"> </a>
   </body>
@@ -51,8 +64,11 @@
       if (document.getElementById("reverse").checked) {
         link = link + "&reverse=true";
       }
-	if (document.getElementById("tag_segments").checked) {
+      if (document.getElementById("tag_segments").checked) {
         link = link + "&tag_segments=true";
+      }
+      if (document.getElementById("favor_aac").checked) {
+        link = link + "&favor_aac=true";
       }
       document.getElementById("rss").href = link;
       document.getElementById("rss").innerHTML =
