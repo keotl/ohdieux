@@ -3,6 +3,7 @@ import os.path
 import ohdieux
 import ohdieux.views
 from jivago.config.production_jivago_context import ProductionJivagoContext
+from jivago.config.router.filtering.filtering_rule import FilteringRule
 from jivago.config.router.router_builder import RouterBuilder
 from jivago.config.startup_hooks import PostInit, PreInit
 from jivago.event.config.annotations import EventHandlerClass
@@ -31,6 +32,8 @@ from ohdieux.communication.programme_refresh_notifier import \
 from ohdieux.config import Config
 from ohdieux.ohdio.ohdio_programme_fetcher import OhdioProgrammeFetcher
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
+from ohdieux.util.wsgi.static_cache_headers_filter import \
+    StaticCacheHeadersFilter
 
 
 class Context(ProductionJivagoContext):
@@ -43,6 +46,7 @@ class Context(ProductionJivagoContext):
                             StaticFileRoutingTable(
                                 os.path.dirname(ohdieux.views.__file__),
                                 allowed_extensions=[".png"]))) \
+            .add_rule(FilteringRule("/static/*", [StaticCacheHeadersFilter])) \
             .add_rule(
                 RoutingRule("/",
                             StaticFileRoutingTable(
