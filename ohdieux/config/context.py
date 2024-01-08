@@ -34,6 +34,8 @@ from ohdieux.ohdio.ohdio_programme_fetcher import OhdioProgrammeFetcher
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 from ohdieux.util.wsgi.static_cache_headers_filter import \
     StaticCacheHeadersFilter
+from ohdieux.util.wsgi.static_file_mimetype_fix_filter import \
+    StaticFileMimetypeFixFilter
 
 
 class Context(ProductionJivagoContext):
@@ -46,7 +48,7 @@ class Context(ProductionJivagoContext):
                             StaticFileRoutingTable(
                                 os.path.dirname(ohdieux.views.__file__),
                                 allowed_extensions=[".png", ".js"]))) \
-            .add_rule(FilteringRule("/static/*", [StaticCacheHeadersFilter])) \
+            .add_rule(FilteringRule("/static/*", [StaticCacheHeadersFilter, StaticFileMimetypeFixFilter])) \
             .add_rule(
                 RoutingRule("/",
                             StaticFileRoutingTable(
