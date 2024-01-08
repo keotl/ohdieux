@@ -60,7 +60,11 @@
     </div>
     <br />
     <a id="rss"> </a>
+    <p>
+      <div id="qrcode"></div>
+    </p>
   </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     document.getElementById("submit").onclick = (e) => {
       let link =
@@ -77,6 +81,8 @@
       document.getElementById("rss").href = link;
       document.getElementById("rss").innerHTML =
         document.getElementById("rss").href;
+      document.getElementById("qrcode").innerHTML = "";
+      let qrcode = new QRCode(document.getElementById("qrcode"), link);
     };
   </script>
 </html>
