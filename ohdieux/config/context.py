@@ -45,7 +45,7 @@ class Context(ProductionJivagoContext):
                 RoutingRule("/static/",
                             StaticFileRoutingTable(
                                 os.path.dirname(ohdieux.views.__file__),
-                                allowed_extensions=[".png"]))) \
+                                allowed_extensions=[".png", ".js"]))) \
             .add_rule(FilteringRule("/static/*", [StaticCacheHeadersFilter])) \
             .add_rule(
                 RoutingRule("/",
