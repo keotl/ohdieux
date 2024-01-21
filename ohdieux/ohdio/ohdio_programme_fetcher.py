@@ -117,7 +117,7 @@ def _fetch_episode_streams(episode_payload: dict) -> List[str]:
 
             return _fetch_stream_url(episode_media_ids)
         _logger.warning(
-            f"Failed to find any streams for episode {playlist_item_id}.")
+            f"Failed to find any streams for episode {episode_payload.get('share', {}).get('url', '')}.")
         return []
 
 
