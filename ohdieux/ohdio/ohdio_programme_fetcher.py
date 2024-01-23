@@ -1,4 +1,5 @@
 import itertools
+import logging
 import multiprocessing.pool
 import os
 from datetime import datetime
@@ -39,7 +40,7 @@ class OhdioProgrammeFetcher(ProgrammeFetchingService):
             title=summary_block.title,
             description="Ce programme est en cours de chargement par Ohdieux. "
             "This programme is currently being indexed by Ohdieux. "
-            "Attendez quelques minutes avant de rafraîchir. "
+            "Veuillez patienter quelques minutes avant de rafraîchir. "
             "Wait a few minutes before refreshing.",
             author=summary_block.author,
             link=summary_block.link,
@@ -96,8 +97,31 @@ def _fetch_page(programme_id: int, page_number: int) -> List[dict]:
 
 
 def _fetch_episode_streams(episode_payload: dict) -> List[str]:
-    stream_id = episode_payload["globalId"]["id"]
-    return _fetch_stream_url(stream_id)
+    playlist_item_id = episode_payload["playlistItemId"]["globalId"]
+    episode_media_id = episode_payload["playlistItemId"]["mediaId"]
+    if episode_media_id:
+        return _fetch_stream_url([episode_media_id])
+    else:
+        response = requests.get(
+            f"https://services.radio-canada.ca/neuro/sphere/v1/medias/apps/playback-lists/{playlist_item_id}?context=web&globalId={playlist_item_id}",
+            timeout=10,
+            headers=USER_AGENT)
+        if response.ok:
+            segment_media_ids = Stream(response.json()["items"]).map(
+                lambda x: x["playlistItemId"]["mediaId"]).toList()
+            episode_media_ids = []
+            for segment in segment_media_ids:
+                if segment in episode_media_ids:
+                    continue
+                episode_media_ids.append(segment)
+
+            return _fetch_stream_url(episode_media_ids)
+        _logger.warning(
+            f"Failed to find any streams for episode {episode_payload.get('share', {}).get('url', '')}.")
+        return []
+
+
+_logger = logging.getLogger("OhdioProgrammeFetcher")
 
 
 def _assemble_episode_descriptor(
@@ -152,26 +176,9 @@ def _fetch_summary_block(programme_id: int):
                             ["pagedConfiguration"]["totalNumberOfItems"])
 
 
-def _fetch_stream_url(episode_media_id: str) -> List[str]:
-    try:
-        episode_segments = OhdioApi().query_episode_segments(
-            "ignored", episode_media_id)
-        distinct_streams = []
-        if "contentDetail" in episode_segments["content"]:
-            # Multi-segment episodes (e.g. programme 672)
-            for segment in episode_segments["content"]["contentDetail"][
-                    "items"]:
-                stream_id = segment["media2"]["id"]
-                if stream_id not in distinct_streams:
-                    distinct_streams.append(stream_id)
-        else:
-            # Single-segment episodes (e.g. programme 9887)
-            distinct_streams.append(episode_segments["header"]["media2"]["id"])
-        segments = distinct_streams
-    except:
-        segments = [episode_media_id]
+def _fetch_stream_url(episode_media_ids: List[str]) -> List[str]:
     urls: List[str] = []
-    for media_id in segments:
+    for media_id in episode_media_ids:
         for platform in ["progressive", "hls"]:
             # Some programmes only work with HLS, e.g. 8362
             res = requests.get(

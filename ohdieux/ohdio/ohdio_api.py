@@ -38,23 +38,6 @@ class OhdioApi(object):
                 f"Failed to retrieve page number {page_number}.")
             raise ApiException(response.text)
 
-    def query_episode_segments(self, programme_id: str,
-                               episode_id: str) -> dict:
-        self._logger.debug(
-            f"Querying episode segments for programme: {programme_id}/{episode_id}."
-        )
-        response = requests.get(
-            f"https://services.radio-canada.ca/neuro/sphere/v1/audio/apps/products/programmes/{programme_id}/episodes/{episode_id}",
-            timeout=10,
-            headers=USER_AGENT)
-        if response.ok:
-            return response.json()
-        else:
-            self._logger.debug(
-                f"Failed to retrieve segments for episode {episode_id}.",
-                response.text)
-            raise ApiException(response.text)
-
     def query_programme(self, programme_id: str) -> dict:
         response = requests.get(self.base_url + programme_id,
                                 headers=USER_AGENT)
