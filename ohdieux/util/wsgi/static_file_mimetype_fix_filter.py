@@ -15,3 +15,5 @@ class StaticFileMimetypeFixFilter(Filter):
         chain.doFilter(request, response)
         if request.path.endswith(".js"):
             response.headers["Content-Type"] = "text/javascript"
+        if request.path.endswith(".png"):
+            response.headers["Content-Type"] = "image/png"
