@@ -6,21 +6,25 @@ const ajv = new Ajv({ strict: false });
 addFormats(ajv);
 ajv.addSchema(swagger, "swagger.json");
 
-describe("programmesWithoutCuesheet", () => {
-  it("get programme episode page", async () => {
-    const programmeEpisodes = await api.getProgrammeWithoutCuesheet({
-      programmeId: "9887",
-      pageNumber: 1,
-    });
-    const valid = ajv.validate(
-      { $ref: "swagger.json#/components/schemas/ProgrammeWithoutCuesheet" },
-      JSON.parse(JSON.stringify(programmeEpisodes)),
-    );
-    if (ajv.errors) {
-      console.log(ajv.errors);
-    }
-    expect(valid).toBeTruthy();
-  });
+describe("programmesWithoutCuesheet compliance test", () => {
+  it.each(["9887", "672", "3858", "3855"])(
+    "get programme episode page",
+    async (programmeId: string) => {
+      const programmeEpisodes = await api.getProgrammeWithoutCuesheet({
+        programmeId,
+        pageNumber: 1,
+      });
+      const valid = ajv.validate(
+        { $ref: "swagger.json#/components/schemas/ProgrammeWithoutCuesheet" },
+        JSON.parse(JSON.stringify(programmeEpisodes)),
+      );
+
+      if (ajv.errors) {
+        console.log(ajv.errors);
+      }
+      expect(valid).toBeTruthy();
+    },
+  );
 });
 
 const api = new DefaultApi(
