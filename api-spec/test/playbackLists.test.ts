@@ -6,18 +6,20 @@ const ajv = new Ajv({ strict: false });
 addFormats(ajv);
 ajv.addSchema(swagger, "swagger.json");
 
-describe("programmesWithoutCuesheet compliance test", () => {
-  it.each(["9887", "672", "3858", "3855"])(
-    "get programme episode page",
-    async (programmeId: string) => {
-      const programmeEpisodes = await api.getProgrammeWithoutCuesheet({
-        programmeId,
-        pageNumber: 1,
+describe("playbackLists compliance test", () => {
+  it.each(["18-805154", "18-645901", "18-786654"])(
+    "fetch playbackList",
+    async (playlistItemId: string) => {
+      const playbackListItem = await api.getPlaylistItemId({
+        playlistItemId,
+        context: "web",
+        globalId: playlistItemId,
       });
       const valid = ajv.validate(
-        { $ref: "swagger.json#/components/schemas/ProgrammeWithoutCuesheet" },
-        JSON.parse(JSON.stringify(programmeEpisodes)),
+        { $ref: "swagger.json#/components/schemas/PlaylistItem" },
+        JSON.parse(JSON.stringify(playbackListItem)),
       );
+
       if (ajv.errors) {
         console.log(ajv.errors);
       }

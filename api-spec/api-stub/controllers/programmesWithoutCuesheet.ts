@@ -1,4 +1,12 @@
 import { Controller, Get, Path, Route } from "tsoa";
+import {
+  ContentType,
+  EpisodeId,
+  FormattedFileSize,
+  MediaId,
+  ProgrammeId,
+  QualifiedEpisodeId,
+} from "./types";
 
 @Route(
   "/neuro/sphere/v1/audio/apps/products/programmes-without-cuesheet-v2/{programmeId}",
@@ -17,19 +25,6 @@ export type Duration = {
   durationInSeconds: number;
 };
 
-type ProgrammeId = string;
-type EpisodeId = string;
-type MediaId = string;
-type FormattedFileSize = string; // e.g. "10 Mo"
-type QualifiedEpisodeId = string; // {contentType}-{episodeId}
-
-type ProgrammeEpisode = {
-  id: 18;
-};
-type Podcast = {
-  id: 24;
-};
-type ContentType = ProgrammeEpisode | Podcast;
 export type ProgrammeWithoutCuesheet = {
   canonicalUrl: string;
   content: {
