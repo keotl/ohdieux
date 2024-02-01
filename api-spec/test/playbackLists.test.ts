@@ -29,5 +29,8 @@ describe("playbackLists compliance test", () => {
 });
 
 const api = new DefaultApi(
-  new Configuration({ basePath: "https://services.radio-canada.ca" }),
+  new Configuration({
+    basePath: "https://services.radio-canada.ca",
+    headers: { "User-Agent": process.env.USER_AGENT || "" },
+  }),
 );
