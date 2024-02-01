@@ -4,6 +4,7 @@ from typing import Optional
 
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
+from jivago.lang.stream import Stream
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor
@@ -22,8 +23,7 @@ class InvalidationStrategy(object):
         self._debouncer = debouncer
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    def should_refresh(self, programme_id: int,
-                       programme: Optional[Programme]) -> bool:
+    def should_refresh(self, programme_id: int, programme: Optional[Programme]) -> bool:
         if programme is None:
             return True
         if datetime.now() > programme.build_date + timedelta(
@@ -38,28 +38,22 @@ class InvalidationStrategy(object):
     def _check_stale(self, programme_id: int, programme: Programme) -> bool:
         self._logger.info(f"Checking staleness for programme {programme_id}.")
         newest_episode = self._fetcher.fetch_newest_episode(programme_id)
-        if newest_episode is None:
-            # Likely some transient error. Let's wait.
-            stale = False
-        elif len(programme.episodes) == 0:
-            stale = True
-        else:
-            stale = _first_url(newest_episode) != _first_url(
-                programme.episodes[0])
-            if not _first_url(newest_episode):
-                self._logger.warning(
-                    f"Got no URL for newest episode {programme_id} {newest_episode}.")
-
+        stale = _is_stale(programme, newest_episode)
         if not stale:
             self._debouncer.set_last_checked_time(programme_id)
 
         return stale
 
 
-def _first_url(episode: Optional[EpisodeDescriptor]) -> str:
-    if episode is None:
-        return ""
-    if not episode.media:
-        return ""
+def _is_stale(old: Programme, new: Optional[EpisodeDescriptor]):
+    if new is None:
+        # Likely some transient error. Let's wait.
+        return False
+    if len(old.episodes) == 0:
+        return True
+    latest_old_episode = old.episodes[0]
+    new_urls = Stream(new.media).map(lambda m: m.media_url).toList()
+    old_urls = Stream(latest_old_episode.media).map(lambda m: m.media_url).toList()
 
-    return episode.media[0].media_url
+    return (new_urls != old_urls or new.title != latest_old_episode.title
+            or new.description != latest_old_episode.description)
