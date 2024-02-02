@@ -43,9 +43,6 @@ export type ProgrammeWithoutCuesheet = {
       pagedConfiguration: Pagination;
       items: {
         broadcastedFirstTimeAt: Date;
-        download: {
-          fileSizeInBytes: number;
-        };
         duration: Duration;
         globalId: {
           contentType: ContentType;
@@ -57,7 +54,7 @@ export type ProgrammeWithoutCuesheet = {
             id: ProgrammeId;
           };
           details: string;
-          download: {
+          download?: {
             fileSizeInBytes: number;
 
             /** Undefined if episode is composed of multiple audio files */
@@ -70,7 +67,6 @@ export type ProgrammeWithoutCuesheet = {
             contentType: ContentType;
             id: EpisodeId;
           };
-          id: MediaId;
 
           title: string;
         };
@@ -85,7 +81,7 @@ export type ProgrammeWithoutCuesheet = {
           mediaId?: MediaId;
           title: string;
         };
-        summary: string;
+        summary: string | undefined;
         title: string;
         url: string;
       }[];

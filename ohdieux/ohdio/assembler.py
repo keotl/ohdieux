@@ -10,7 +10,6 @@ from ohdieux.ohdio.generated.models.programme_without_cuesheet import \
 from ohdieux.ohdio.generated.models.programme_without_cuesheet_content_content_detail_items_inner import \
     ProgrammeWithoutCuesheetContentContentDetailItemsInner
 from ohdieux.ohdio.parse_utils import clean
-from ohdieux.util.dateparse import infer_fr_date
 
 
 def assemble_pending_programme(programme: ProgrammeWithoutCuesheet) -> Programme:
@@ -62,7 +61,7 @@ def assemble_episode(episode: ProgrammeWithoutCuesheetContentContentDetailItemsI
                      streams: Iterable[str]) -> EpisodeDescriptor:
     return EpisodeDescriptor(
         title=clean(episode.title),
-        description=clean(episode.summary),
+        description=clean(episode.summary or ""),
         guid=episode.global_id.id,
         date=episode.broadcasted_first_time_at,
         duration=int(episode.media2.duration.duration_in_seconds),
