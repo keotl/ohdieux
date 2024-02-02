@@ -14,6 +14,7 @@ class Config(object):
     cache_refresh_delay_s: int
     fetch_threads: int
     cache_strategy: Literal["memory", "redis"]
+    user_agent: str
 
     @Inject
     def __init__(self, application_properties: ApplicationProperties,
@@ -35,3 +36,6 @@ class Config(object):
             application_properties.get("STRATEGIE_CACHE") or \
             env.get("STRATEGIE_CACHE") or \
             "memory"
+
+        self.user_agent = application_properties.get("USER_AGENT") or \
+            env.get("USER_AGENT") or ""

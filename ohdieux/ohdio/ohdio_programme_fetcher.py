@@ -13,7 +13,6 @@ from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
 from ohdieux.model.programme import Programme
 from ohdieux.model.programme_descriptor import ProgrammeDescriptor
-from ohdieux.ohdio.ohdio_api import OhdioApi
 from ohdieux.ohdio.parse_utils import clean
 from ohdieux.service.programme_fetching_service import (
     ProgrammeFetchingService, ProgrammeNotFoundException)

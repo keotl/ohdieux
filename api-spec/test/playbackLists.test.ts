@@ -10,7 +10,7 @@ describe("playbackLists compliance test", () => {
   it.each(["18-805154", "18-645901", "18-786654"])(
     "fetch playbackList",
     async (playlistItemId: string) => {
-      const playbackListItem = await api.getPlaylistItemId({
+      const playbackListItem = await api.getPlaylistItem({
         playlistItemId,
         context: "web",
         globalId: playlistItemId,

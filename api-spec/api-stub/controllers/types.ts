@@ -11,3 +11,12 @@ export type Podcast = {
   id: 24;
 };
 export type ContentType = ProgrammeEpisode | Podcast;
+
+export type Pagination = {
+  nextPageUrl: string | null;
+  pageMaxLength: number;
+  pageNumber: number;
+  pageSize: number;
+  previousPageUrl: string | null;
+  totalNumberOfItems: number;
+};

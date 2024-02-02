@@ -4,6 +4,7 @@ import {
   EpisodeId,
   FormattedFileSize,
   MediaId,
+  Pagination,
   ProgrammeId,
   QualifiedEpisodeId,
 } from "./types";
@@ -27,8 +28,19 @@ export type Duration = {
 
 export type ProgrammeWithoutCuesheet = {
   canonicalUrl: string;
+  header: {
+    title: string;
+    summary: string;
+    share: {
+      url: string;
+    };
+    picture: {
+      url: string;
+    };
+  };
   content: {
     contentDetail: {
+      pagedConfiguration: Pagination;
       items: {
         broadcastedFirstTimeAt: Date;
         download: {

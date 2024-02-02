@@ -4,7 +4,7 @@ import { MediaId, QualifiedEpisodeId } from "./types";
 @Route("/neuro/sphere/v1/medias/apps/playback-lists/{playlistItemId}")
 export class PlaybackListsController extends Controller {
   @Get()
-  public getPlaylistItemId(
+  public getPlaylistItem(
     @Path() playlistItemId: QualifiedEpisodeId,
     @Query() context: "web",
     @Query() globalId: QualifiedEpisodeId,

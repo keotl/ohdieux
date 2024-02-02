@@ -19,8 +19,7 @@ from ohdieux.caching.inmemory_programme_cache import InmemoryProgrammeCache
 from ohdieux.caching.inmemory_staleness_check_debouncer import \
     InmemoryStalenessCheckDebouncer
 from ohdieux.caching.programme_cache import ProgrammeCache
-from ohdieux.caching.redis_adapter import (RedisAdapter,
-                                           RedisPendingQueueJanitor,
+from ohdieux.caching.redis_adapter import (RedisAdapter, RedisPendingQueueJanitor,
                                            RedisRefreshListener)
 from ohdieux.caching.redis_staleness_check_debouncer import \
     RedisStalenessCheckDebouncer
@@ -30,7 +29,7 @@ from ohdieux.communication.in_process_refresh_notifier import \
 from ohdieux.communication.programme_refresh_notifier import \
     ProgrammeRefreshNotifier
 from ohdieux.config import Config
-from ohdieux.ohdio.ohdio_programme_fetcher import OhdioProgrammeFetcher
+from ohdieux.ohdio.asyncio_programme_fetcher import AsyncioProgrammeFetcher
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 from ohdieux.util.wsgi.static_cache_headers_filter import \
     StaticCacheHeadersFilter
@@ -57,14 +56,12 @@ class Context(ProductionJivagoContext):
 
     @Override
     def configure_service_locator(self):
-        self.service_locator().bind(ProgrammeFetchingService,
-                                    OhdioProgrammeFetcher)
+        self.service_locator().bind(ProgrammeFetchingService, AsyncioProgrammeFetcher)
         return super().configure_service_locator()
 
 
 @Provider
-def configure_cache(config: Config,
-                    service_locator: ServiceLocator) -> ProgrammeCache:
+def configure_cache(config: Config, service_locator: ServiceLocator) -> ProgrammeCache:
     if config.cache_strategy == "memory":
         return service_locator.get(InmemoryProgrammeCache)
     elif config.cache_strategy == "redis":

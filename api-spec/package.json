@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "tsoa": "tsoa spec",
-    "apiclient:generate": "rm -fr src/generated && openapi-generator-cli generate -i build/swagger.json -g typescript-fetch -o src/generated"
+      "apiclient:generate": "rm -fr src/generated && openapi-generator-cli generate -i build/swagger.json -g typescript-fetch -o src/generated",
+      "apiclient:generate-python": "rm -fr ../ohdieux/ohdio/generated/ ./build/python-client && openapi-generator-cli generate -i build/swagger.json -g python -o ./build/python-client --additional-properties=generateSourceCodeOnly=true,library=asyncio,packageName=ohdieux.ohdio.generated && cp -r ./build/python-client/ohdieux/ohdio/generated ../ohdieux/ohdio/generated"
   },
   "author": "",
   "license": "ISC",
