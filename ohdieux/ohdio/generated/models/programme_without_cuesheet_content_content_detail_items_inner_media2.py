@@ -38,7 +38,7 @@ class ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2(BaseModel):
     global_id: ProgrammeWithoutCuesheetContentContentDetailItemsInnerPlaylistItemIdGlobalId2 = Field(alias="globalId")
     duration: Duration
     download: Optional[ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2Download] = None
-    details: StrictStr
+    details: Optional[StrictStr] = None
     context: ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2Context
     __properties: ClassVar[List[str]] = ["title", "globalId", "duration", "download", "details", "context"]
 

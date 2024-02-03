@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **global_id** | [**ProgrammeWithoutCuesheetContentContentDetailItemsInnerPlaylistItemIdGlobalId2**](ProgrammeWithoutCuesheetContentContentDetailItemsInnerPlaylistItemIdGlobalId2.md) |  | 
 **duration** | [**Duration**](Duration.md) |  | 
 **download** | [**ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2Download**](ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2Download.md) |  | [optional] 
-**details** | **str** |  | 
+**details** | **str** |  | [optional] 
 **context** | [**ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2Context**](ProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2Context.md) |  | 
 
 ## Example

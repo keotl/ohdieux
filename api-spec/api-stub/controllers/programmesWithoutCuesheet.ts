@@ -53,7 +53,7 @@ export type ProgrammeWithoutCuesheet = {
             contentType: ContentType;
             id: ProgrammeId;
           };
-          details: string;
+          details?: string;
           download?: {
             fileSizeInBytes: number;
 

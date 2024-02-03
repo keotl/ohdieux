@@ -60,7 +60,6 @@ class TestProgrammeWithoutCuesheetContentContentDetailItemsInnerMedia2(unittest.
                     content_type = null, ),
                 duration = ohdieux.ohdio.generated.models.duration.Duration(
                     duration_in_seconds = 1.337, ),
-                details = '',
                 context = ohdieux.ohdio.generated.models.programme_without_cuesheet_content_content_detail_items_inner_media2_context.ProgrammeWithoutCuesheet_content_contentDetail_items_inner_media2_context(
                     id = '', 
                     content_type = null, ),
