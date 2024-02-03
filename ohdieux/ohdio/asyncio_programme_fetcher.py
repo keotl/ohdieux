@@ -4,8 +4,10 @@ import threading
 from typing import Awaitable, Iterable, List, Optional, cast
 
 import ohdieux.ohdio.generated
+from jivago.config.startup_hooks import PreShutdown
 from jivago.inject.annotation import Component, Singleton
 from jivago.lang.annotations import Inject, Override
+from jivago.lang.runnable import Runnable
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor
 from ohdieux.model.programme import Programme
@@ -13,11 +15,13 @@ from ohdieux.ohdio.assembler import (assemble_episode, assemble_pending_programm
                                      assemble_programme)
 from ohdieux.ohdio.generated.api.default_api import DefaultApi
 from ohdieux.ohdio.generated.configuration import Configuration
+from ohdieux.ohdio.generated.exceptions import NotFoundException
 from ohdieux.ohdio.generated.models.programme_without_cuesheet_content_content_detail_items_inner import \
     ProgrammeWithoutCuesheetContentContentDetailItemsInner
 from ohdieux.ohdio.generated.models.streaming_tech import StreamingTech
 from ohdieux.ohdio.generated.rest import ApiException
-from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
+from ohdieux.service.programme_fetching_service import (ProgrammeFetchingService,
+                                                        ProgrammeNotFoundException)
 from pydantic import ValidationError
 
 
@@ -49,6 +53,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
 
             return await self._fetch_episode(api,
                                              programme.content.content_detail.items[0])
+        except NotFoundException:
+            raise ProgrammeNotFoundException(programme_id)
         finally:
             await api.api_client.close()
 
@@ -69,6 +75,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         try:
             response = await api.get_programme_without_cuesheet(str(programme_id), 1)
             return assemble_pending_programme(response)
+        except NotFoundException:
+            raise ProgrammeNotFoundException(programme_id)
         finally:
             await api.api_client.close()
 
@@ -98,6 +106,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             valid_episodes = cast(Iterable[EpisodeDescriptor],
                                   filter(lambda x: x, episode_descriptors))
             return assemble_programme(first_page, list(valid_episodes))
+        except NotFoundException:
+            raise ProgrammeNotFoundException(programme_id)
         finally:
             await api.api_client.close()
 
@@ -169,3 +179,19 @@ def _distinct(items: Iterable[str]) -> List[str]:
             seen.add(item)
             result.append(item)
     return result
+
+
+@PreShutdown
+@Component
+class _AsyncioProgrammeFetcherCleanup(Runnable):
+
+    @Inject
+    def __init__(self, fetcher: AsyncioProgrammeFetcher):
+        self._fetcher = fetcher
+        self._logger = logging.getLogger(self.__class__.__name__)
+
+    @Override
+    def run(self):
+        self._logger.info("Stopping event loop.")
+        self._fetcher.event_loop.call_soon_threadsafe(self._fetcher.event_loop.stop)
+        self._fetcher.thread.join()

@@ -1,5 +1,6 @@
 gunicorn==20.1.0
-jivago==0.6.5
+git+https://github.com/keotl/jivago@develop
+#jivago==0.6.5
 MarkupSafe==2.1.1
 python-dateutil==2.8.2
 PyYAML==6.0.1
