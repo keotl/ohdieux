@@ -48,7 +48,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         api = self._create_api_client()
         try:
             programme = await api.get_programme_without_cuesheet(str(programme_id), 1)
-            if not programme.content.content_detail:
+            if not programme.content.content_detail or not programme.content.content_detail.items:
                 return None
 
             return await self._fetch_episode(api,
