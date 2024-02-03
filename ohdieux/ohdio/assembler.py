@@ -24,24 +24,7 @@ def assemble_pending_programme(programme: ProgrammeWithoutCuesheet) -> Programme
         image_url=programme.header.picture.url.replace("{0}",
                                                        "1400").replace("{1}", "1x1"))
 
-    return Programme(programme_descriptor, [_pending_placeholder_episode],
-                     datetime.now())
-
-
-_pending_placeholder_episode = EpisodeDescriptor(
-    "Veuillez patienter. Please wait.",
-    "Ce programme est en cours de chargement par Ohdieux. "
-    "This programme is currently being indexed by Ohdieux. "
-    "Veuillez patienter quelques minutes avant de rafraîchir. "
-    "Wait a few minutes before refreshing.",
-    "0000000000",
-    datetime.now(),
-    duration=1,
-    media=[
-        MediaDescriptor("https://ohdieux.ligature.ca/placeholder.mp4",
-                        media_type="audio/mpeg",
-                        length=1)
-    ])
+    return Programme(programme_descriptor, [], datetime.now())
 
 
 def assemble_programme(programme: ProgrammeWithoutCuesheet,
