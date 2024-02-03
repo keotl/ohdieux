@@ -7,7 +7,7 @@ addFormats(ajv);
 ajv.addSchema(swagger, "swagger.json");
 
 describe("programmesWithoutCuesheet compliance test", () => {
-  it.each(["9887", "672", "3858", "3855"])(
+  it.each(["9887", "672", "3858", "3855", "8362"])(
     "get programme episode page",
     async (programmeId: string) => {
       const programmeEpisodes = await api.getProgrammeWithoutCuesheet({

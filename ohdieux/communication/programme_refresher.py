@@ -47,7 +47,7 @@ class ProgrammeRefresher(object):
             raise e
         except Exception:
             self._logger.error(
-                f"Uncaught exception while refreshing programme {tb.format_exc()}."
+                f"Uncaught exception while refreshing programme {programme_id} {tb.format_exc()}."
             )
         finally:
             self._bus.emit("refresh_complete", programme_id)
