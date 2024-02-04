@@ -35,7 +35,7 @@
 
     <div style="display: flex; align-items: center; gap: 10px">
       <div>
-        <label for="programme_id">Code d'émission / Programme ID</label><br/>
+        <label for="programme_id">Code d'émission / Programme ID</label><br />
         <input id="programme_id" />
         <button id="submit">Soumettre / Submit</button>
       </div>
@@ -56,13 +56,19 @@
             >Préférer AAC (expérimental) / Prefer AAC (experimental)
           </label>
         </div>
+        <div>
+          <input type="checkbox" id="limit_episodes" />
+          <label for="limit_episodes">
+            Limiter nombre d'épisodes / Limit episode count
+          </label>
+        </div>
       </div>
     </div>
     <br />
     <a id="rss"> </a>
-    <p>
+    <div>
       <div id="qrcode"></div>
-    </p>
+    </div>
   </body>
   <script src="/static/qrcode.js"></script>
   <script>
@@ -77,6 +83,9 @@
       }
       if (document.getElementById("favor_aac").checked) {
         link = link + "&favor_aac=true";
+      }
+      if (document.getElementById("limit_episodes").checked) {
+        link = link + "&limit_episodes=true";
       }
       document.getElementById("rss").href = link;
       document.getElementById("rss").innerHTML =
