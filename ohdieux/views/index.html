@@ -91,7 +91,10 @@
       document.getElementById("rss").innerHTML =
         document.getElementById("rss").href;
       document.getElementById("qrcode").innerHTML = "";
-      let qrcode = new QRCode(document.getElementById("qrcode"), link);
+      let qrcode = new QRCode(
+        document.getElementById("qrcode"),
+        new URL(link, location.href).href,
+      );
     };
   </script>
 </html>
