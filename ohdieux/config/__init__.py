@@ -23,7 +23,7 @@ class Config(object):
             env.get("CACHE_REFRESH_DELAY") or \
             application_properties.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
             env.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
-            86400)
+            3600 * 24 * 7)
 
         self.fetch_threads = int(application_properties.get("FETCH_THREADS") or \
             env.get("FETCH_THREADS") or \
