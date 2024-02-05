@@ -19,24 +19,22 @@ class ProgrammeResponse(NamedTuple):
 class ManifestService(object):
 
     @Inject
-    def __init__(self, cache: ProgrammeCache,
-                 invalidation: InvalidationStrategy,
-                 refresh: ProgrammeRefreshNotifier,
-                 fetcher: ProgrammeFetchingService):
+    def __init__(self, cache: ProgrammeCache, invalidation: InvalidationStrategy,
+                 refresh: ProgrammeRefreshNotifier, fetcher: ProgrammeFetchingService):
         self._cache = cache
         self._invalidation = invalidation
         self._refresh = refresh
         self._fetcher = fetcher
 
-    def generate_podcast_manifest(self,
-                                  programme_id: int) -> ProgrammeResponse:
+    def generate_podcast_manifest(self, programme_id: int) -> ProgrammeResponse:
         programme = self._cache.get(programme_id)
         should_cache = True
-        if self._invalidation.should_refresh(programme_id, programme):
-            self._refresh.notify_refresh(programme_id)
 
         if programme is None:
             programme = self._fetcher.fetch_slim_programme(programme_id)
             should_cache = False
+
+        if self._invalidation.should_refresh(programme_id, programme):
+            self._refresh.notify_refresh(programme_id)
 
         return ProgrammeResponse(programme, should_cache)
