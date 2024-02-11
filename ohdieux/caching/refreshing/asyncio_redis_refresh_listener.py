@@ -3,6 +3,7 @@ import logging
 import traceback
 
 import redis
+from jivago.event.synchronous_event_bus import SynchronousEventBus
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 from ohdieux.caching.redis_adapter import RedisAdapter
@@ -13,11 +14,13 @@ from ohdieux.ohdio.asyncio_programme_fetcher import AsyncioProgrammeFetcher
 class AsyncioRedisRefreshListener(object):
 
     @Inject
-    def __init__(self, redis: RedisAdapter, fetcher: AsyncioProgrammeFetcher):
+    def __init__(self, redis: RedisAdapter, fetcher: AsyncioProgrammeFetcher,
+                 event_bus: SynchronousEventBus):
         self._redis = redis
         self._logger = logging.getLogger(self.__class__.__name__)
         self._should_stop = False
         self._fetcher = fetcher
+        self._bus = event_bus
 
     async def run_refresher(self):
         while not self._should_stop:
@@ -51,3 +54,5 @@ class AsyncioRedisRefreshListener(object):
         except Exception as e:
             self._logger.error(
                 f"Uncaught exception while refreshing programme {programme_id} {e}")
+        finally:
+            self._bus.emit("refresh_complete", programme_id)
