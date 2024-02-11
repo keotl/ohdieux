@@ -12,7 +12,6 @@ from jivago.lang.annotations import Inject
 @Singleton
 class Config(object):
     cache_refresh_delay_s: int
-    fetch_threads: int
     cache_strategy: Literal["memory", "redis"]
     user_agent: str
     run_fetcher_worker: bool
@@ -25,12 +24,6 @@ class Config(object):
             application_properties.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
             env.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
             3600 * 24 * 7)
-
-        self.fetch_threads = int(application_properties.get("FETCH_THREADS") or \
-            env.get("FETCH_THREADS") or \
-            application_properties.get("FILS_REQUETES") or \
-            env.get("FILS_REQUETES") or \
-            4)
 
         self.cache_strategy = application_properties.get("CACHE_STRATEGY") or \
             env.get("CACHE_STRATEGY") or \

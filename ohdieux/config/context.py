@@ -30,7 +30,6 @@ from ohdieux.communication.programme_refresh_notifier import \
     ProgrammeRefreshNotifier
 from ohdieux.config import Config
 from ohdieux.ohdio.asyncio_programme_fetcher import AsyncioProgrammeFetcher
-from ohdieux.ohdio.ohdio_programme_fetcher import OhdioProgrammeFetcher
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 from ohdieux.util.wsgi.static_cache_headers_filter import \
     StaticCacheHeadersFilter
