@@ -15,6 +15,7 @@ class Config(object):
     fetch_threads: int
     cache_strategy: Literal["memory", "redis"]
     user_agent: str
+    run_fetcher_worker: bool
 
     @Inject
     def __init__(self, application_properties: ApplicationProperties,
@@ -39,3 +40,6 @@ class Config(object):
 
         self.user_agent = application_properties.get("USER_AGENT") or \
             env.get("USER_AGENT") or ""
+
+        self.run_fetcher_worker = (application_properties.get("RUN_FETCHER_WORKER") or \
+            env.get("RUN_FETCHER_WORKER") or "") in ("", "True", "true", "t", "1", "y", "yes")

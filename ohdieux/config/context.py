@@ -99,12 +99,14 @@ class BackgroundThreadBinder(Runnable):
     @Inject
     def __init__(self, config: Config):
         self.cache_strategy = config.cache_strategy
+        self.run_worker_process = config.run_fetcher_worker
 
     @Override
     def run(self):
         if self.cache_strategy == "redis":
             EventHandlerClass(RedisAdapter)
-            BackgroundWorker(RedisRefreshListener)
+            if self.run_worker_process:
+                BackgroundWorker(RedisRefreshListener)
             PostInit(RedisPendingQueueJanitor)
             Scheduled(every=Duration.DAY)(RedisPendingQueueJanitor)
         elif self.cache_strategy == "memory":

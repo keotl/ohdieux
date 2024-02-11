@@ -39,20 +39,20 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
 
     @Override
     def fetch_newest_episode(self, programme_id: int) -> Optional[EpisodeDescriptor]:
-        res = asyncio.run_coroutine_threadsafe(self._fetch_newest_episode(programme_id),
-                                               self.event_loop)
+        res = asyncio.run_coroutine_threadsafe(
+            self.fetch_newest_episode_async(programme_id), self.event_loop)
         return res.result()
 
-    async def _fetch_newest_episode(self,
-                                    programme_id: int) -> Optional[EpisodeDescriptor]:
+    async def fetch_newest_episode_async(
+            self, programme_id: int) -> Optional[EpisodeDescriptor]:
         api = self._create_api_client()
         try:
             programme = await api.get_programme_without_cuesheet(str(programme_id), 1)
             if not programme.content.content_detail or not programme.content.content_detail.items:
                 return None
 
-            return await self._fetch_episode(api,
-                                             programme.content.content_detail.items[0])
+            return await self._fetch_episode_async(
+                api, programme.content.content_detail.items[0])
         except NotFoundException:
             raise ProgrammeNotFoundException(programme_id)
         finally:
@@ -61,16 +61,16 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
     @Override
     def fetch_programme(self, programme_id: int) -> Programme:
         res = asyncio.run_coroutine_threadsafe(
-            self._fetch_entire_programme(programme_id), self.event_loop)
+            self.fetch_entire_programme_async(programme_id), self.event_loop)
         return res.result()
 
     @Override
     def fetch_slim_programme(self, programme_id: int) -> Programme:
-        res = asyncio.run_coroutine_threadsafe(self._fetch_slim_programme(programme_id),
-                                               self.event_loop)
+        res = asyncio.run_coroutine_threadsafe(
+            self.fetch_slim_programme_async(programme_id), self.event_loop)
         return res.result()
 
-    async def _fetch_slim_programme(self, programme_id: int) -> Programme:
+    async def fetch_slim_programme_async(self, programme_id: int) -> Programme:
         api = self._create_api_client()
         try:
             response = await api.get_programme_without_cuesheet(str(programme_id), 1)
@@ -80,7 +80,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         finally:
             await api.api_client.close()
 
-    async def _fetch_entire_programme(self, programme_id: int) -> Programme:
+    async def fetch_entire_programme_async(self, programme_id: int) -> Programme:
         api = self._create_api_client()
         try:
             next_page: Optional[int] = 1
@@ -92,7 +92,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
                 if first_page is None:
                     first_page = page
                 episodes.extend(
-                    map(lambda item: self._fetch_episode(api, item),
+                    map(lambda item: self._fetch_episode_async(api, item),
                         page.content.content_detail.items))
 
                 if page.content.content_detail.paged_configuration.next_page_url:
@@ -111,13 +111,13 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         finally:
             await api.api_client.close()
 
-    async def _fetch_episode(
+    async def _fetch_episode_async(
         self, api: DefaultApi,
         episode: ProgrammeWithoutCuesheetContentContentDetailItemsInner
     ) -> Optional[EpisodeDescriptor]:
         try:
             if episode.playlist_item_id.media_id:
-                streams = await self._fetch_episode_streams(
+                streams = await self._fetch_episode_streams_async(
                     api, [episode.playlist_item_id.media_id])
             else:
                 playlist_item_id = episode.playlist_item_id.global_id
@@ -125,7 +125,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
                                                              playlist_item_id)
                 media_ids = _distinct(item.playlist_item_id.media_id
                                       for item in playlist_items.items)
-                streams = await self._fetch_episode_streams(api, media_ids)
+                streams = await self._fetch_episode_streams_async(api, media_ids)
 
             return assemble_episode(episode, streams)
         except ValidationError as e:
@@ -133,15 +133,15 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         except ApiException:
             return None
 
-    async def _fetch_episode_streams(self, api: DefaultApi,
-                                     media_ids: Iterable[str]) -> Iterable[str]:
-        streams = await asyncio.gather(
-            *map(lambda media_id: self._fetch_single_episode_stream(api, media_id),
-                 media_ids))
+    async def _fetch_episode_streams_async(self, api: DefaultApi,
+                                           media_ids: Iterable[str]) -> Iterable[str]:
+        streams = await asyncio.gather(*map(
+            lambda media_id: self._fetch_single_episode_stream_async(api, media_id),
+            media_ids))
         return cast(Iterable[str], filter(lambda x: x is not None, streams))
 
-    async def _fetch_single_episode_stream(self, api: DefaultApi,
-                                           media_id: str) -> Optional[str]:
+    async def _fetch_single_episode_stream_async(self, api: DefaultApi,
+                                                 media_id: str) -> Optional[str]:
         for tech in ["progressive", "hls"]:
             try:
                 stream = await api.get_media_stream(app_code="medianet",
