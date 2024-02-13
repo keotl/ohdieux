@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import traceback
+from datetime import datetime
 
 import redis
 from jivago.event.synchronous_event_bus import SynchronousEventBus
@@ -32,7 +33,12 @@ class AsyncioRedisRefreshListener(object):
                     programme_id = int(message.get("data"))
                     if self._redis._mark_pending_and_should_send_refresh_message(
                             programme_id):
+                        self._logger.info(f"Refreshing programme {programme_id}.")
+                        start = datetime.now()
                         await self._do_refresh(programme_id)
+                        self._logger.info(
+                            f"Done refreshing programme {programme_id} in {datetime.now() - start}."
+                        )
 
             except redis.exceptions.RedisError as e:
                 self._logger.warning(

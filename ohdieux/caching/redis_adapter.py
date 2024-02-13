@@ -104,6 +104,7 @@ class RedisRefreshListener(Runnable):
 
     @Override
     def run(self):
+        self._logger.info("Starting RedisRefreshListener")
         while True:
             try:
                 self._pubsub.subscribe("refresh_programme")

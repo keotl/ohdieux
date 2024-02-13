@@ -34,5 +34,6 @@ class Config(object):
         self.user_agent = application_properties.get("USER_AGENT") or \
             env.get("USER_AGENT") or ""
 
-        self.run_fetcher_worker = (application_properties.get("RUN_FETCHER_WORKER") or \
-            env.get("RUN_FETCHER_WORKER") or "") in ("", "True", "true", "t", "1", "y", "yes")
+        self.run_fetcher_worker = (application_properties.get("RUN_FETCHER_WORKER")
+                                   or env.get("RUN_FETCHER_WORKER")
+                                   or "") in ("", "True", "true", "t", "1", "y", "yes")
