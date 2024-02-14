@@ -13,6 +13,7 @@ describe("programmesWithoutCuesheet compliance test", () => {
       const programmeEpisodes = await api.getProgrammeWithoutCuesheet({
         programmeId,
         pageNumber: 1,
+        context: "web",
       });
       const valid = ajv.validate(
         { $ref: "swagger.json#/components/schemas/ProgrammeWithoutCuesheet" },

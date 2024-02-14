@@ -81,8 +81,6 @@ class TestProgrammeWithoutCuesheet(unittest.TestCase):
                 header = ohdieux.ohdio.generated.models.programme_without_cuesheet_header.ProgrammeWithoutCuesheet_header(
                     picture = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
                         url = '', ), 
-                    share = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
-                        url = '', ), 
                     summary = '', 
                     title = '', ),
                 canonical_url = ''
@@ -133,8 +131,6 @@ class TestProgrammeWithoutCuesheet(unittest.TestCase):
                             next_page_url = '', ), ), ),
                 header = ohdieux.ohdio.generated.models.programme_without_cuesheet_header.ProgrammeWithoutCuesheet_header(
                     picture = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
-                        url = '', ), 
-                    share = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
                         url = '', ), 
                     summary = '', 
                     title = '', ),

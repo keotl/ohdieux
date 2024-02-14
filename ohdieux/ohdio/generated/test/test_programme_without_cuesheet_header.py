@@ -38,16 +38,12 @@ class TestProgrammeWithoutCuesheetHeader(unittest.TestCase):
             return ProgrammeWithoutCuesheetHeader(
                 picture = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
                     url = '', ),
-                share = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
-                    url = '', ),
                 summary = '',
                 title = ''
             )
         else:
             return ProgrammeWithoutCuesheetHeader(
                 picture = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
-                    url = '', ),
-                share = ohdieux.ohdio.generated.models.programme_without_cuesheet_header_picture.ProgrammeWithoutCuesheet_header_picture(
                     url = '', ),
                 summary = '',
                 title = '',

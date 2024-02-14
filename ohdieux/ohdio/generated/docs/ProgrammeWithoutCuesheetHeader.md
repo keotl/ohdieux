@@ -6,7 +6,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **picture** | [**ProgrammeWithoutCuesheetHeaderPicture**](ProgrammeWithoutCuesheetHeaderPicture.md) |  | 
-**share** | [**ProgrammeWithoutCuesheetHeaderPicture**](ProgrammeWithoutCuesheetHeaderPicture.md) |  | 
 **summary** | **str** |  | 
 **title** | **str** |  | 
 

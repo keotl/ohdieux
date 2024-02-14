@@ -31,10 +31,9 @@ class ProgrammeWithoutCuesheetHeader(BaseModel):
     ProgrammeWithoutCuesheetHeader
     """ # noqa: E501
     picture: ProgrammeWithoutCuesheetHeaderPicture
-    share: ProgrammeWithoutCuesheetHeaderPicture
     summary: StrictStr
     title: StrictStr
-    __properties: ClassVar[List[str]] = ["picture", "share", "summary", "title"]
+    __properties: ClassVar[List[str]] = ["picture", "summary", "title"]
 
     model_config = {
         "populate_by_name": True,
@@ -76,9 +75,6 @@ class ProgrammeWithoutCuesheetHeader(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of picture
         if self.picture:
             _dict['picture'] = self.picture.to_dict()
-        # override the default output from pydantic by calling `to_dict()` of share
-        if self.share:
-            _dict['share'] = self.share.to_dict()
         return _dict
 
     @classmethod
@@ -92,7 +88,6 @@ class ProgrammeWithoutCuesheetHeader(BaseModel):
 
         _obj = cls.model_validate({
             "picture": ProgrammeWithoutCuesheetHeaderPicture.from_dict(obj.get("picture")) if obj.get("picture") is not None else None,
-            "share": ProgrammeWithoutCuesheetHeaderPicture.from_dict(obj.get("share")) if obj.get("share") is not None else None,
             "summary": obj.get("summary"),
             "title": obj.get("title")
         })

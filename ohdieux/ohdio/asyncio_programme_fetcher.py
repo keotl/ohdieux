@@ -47,7 +47,9 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             self, programme_id: int) -> Optional[EpisodeDescriptor]:
         api = self._create_api_client()
         try:
-            programme = await api.get_programme_without_cuesheet(str(programme_id), 1)
+            programme = await api.get_programme_without_cuesheet(str(programme_id),
+                                                                 1,
+                                                                 context="web")
             if not programme.content.content_detail or not programme.content.content_detail.items:
                 return None
 
@@ -73,7 +75,9 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
     async def fetch_slim_programme_async(self, programme_id: int) -> Programme:
         api = self._create_api_client()
         try:
-            response = await api.get_programme_without_cuesheet(str(programme_id), 1)
+            response = await api.get_programme_without_cuesheet(str(programme_id),
+                                                                1,
+                                                                context="web")
             return assemble_pending_programme(response)
         except NotFoundException:
             raise ProgrammeNotFoundException(programme_id)
@@ -87,8 +91,9 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             episodes: List[Awaitable[Optional[EpisodeDescriptor]]] = []
             first_page = None
             while next_page != None:
-                page = await api.get_programme_without_cuesheet(
-                    str(programme_id), next_page)
+                page = await api.get_programme_without_cuesheet(str(programme_id),
+                                                                next_page,
+                                                                context="web")
                 if first_page is None:
                     first_page = page
                 episodes.extend(

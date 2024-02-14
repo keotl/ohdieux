@@ -701,6 +701,7 @@ class DefaultApi:
         self,
         programme_id: StrictStr,
         page_number: Union[StrictFloat, StrictInt],
+        context: StrictStr,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -721,6 +722,8 @@ class DefaultApi:
         :type programme_id: str
         :param page_number: (required)
         :type page_number: float
+        :param context: (required)
+        :type context: str
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -746,6 +749,7 @@ class DefaultApi:
         _param = self._get_programme_without_cuesheet_serialize(
             programme_id=programme_id,
             page_number=page_number,
+            context=context,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -771,6 +775,7 @@ class DefaultApi:
         self,
         programme_id: StrictStr,
         page_number: Union[StrictFloat, StrictInt],
+        context: StrictStr,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -791,6 +796,8 @@ class DefaultApi:
         :type programme_id: str
         :param page_number: (required)
         :type page_number: float
+        :param context: (required)
+        :type context: str
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -816,6 +823,7 @@ class DefaultApi:
         _param = self._get_programme_without_cuesheet_serialize(
             programme_id=programme_id,
             page_number=page_number,
+            context=context,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -841,6 +849,7 @@ class DefaultApi:
         self,
         programme_id: StrictStr,
         page_number: Union[StrictFloat, StrictInt],
+        context: StrictStr,
         _request_timeout: Union[
             None,
             Annotated[StrictFloat, Field(gt=0)],
@@ -861,6 +870,8 @@ class DefaultApi:
         :type programme_id: str
         :param page_number: (required)
         :type page_number: float
+        :param context: (required)
+        :type context: str
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
@@ -886,6 +897,7 @@ class DefaultApi:
         _param = self._get_programme_without_cuesheet_serialize(
             programme_id=programme_id,
             page_number=page_number,
+            context=context,
             _request_auth=_request_auth,
             _content_type=_content_type,
             _headers=_headers,
@@ -906,6 +918,7 @@ class DefaultApi:
         self,
         programme_id,
         page_number,
+        context,
         _request_auth,
         _content_type,
         _headers,
@@ -930,6 +943,10 @@ class DefaultApi:
         if page_number is not None:
             _path_params['pageNumber'] = page_number
         # process the query parameters
+        if context is not None:
+            
+            _query_params.append(('context', context))
+            
         # process the header parameters
         # process the form parameters
         # process the body parameter

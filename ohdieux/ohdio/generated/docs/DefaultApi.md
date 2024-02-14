@@ -161,7 +161,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_programme_without_cuesheet**
-> ProgrammeWithoutCuesheet get_programme_without_cuesheet(programme_id, page_number)
+> ProgrammeWithoutCuesheet get_programme_without_cuesheet(programme_id, page_number, context)
 
 
 
@@ -189,9 +189,10 @@ async with ohdieux.ohdio.generated.ApiClient(configuration) as api_client:
     api_instance = ohdieux.ohdio.generated.DefaultApi(api_client)
     programme_id = 'programme_id_example' # str | 
     page_number = 3.4 # float | 
+    context = 'context_example' # str | 
 
     try:
-        api_response = await api_instance.get_programme_without_cuesheet(programme_id, page_number)
+        api_response = await api_instance.get_programme_without_cuesheet(programme_id, page_number, context)
         print("The response of DefaultApi->get_programme_without_cuesheet:\n")
         pprint(api_response)
     except Exception as e:
@@ -207,6 +208,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **programme_id** | **str**|  | 
  **page_number** | **float**|  | 
+ **context** | **str**|  | 
 
 ### Return type
 
