@@ -20,7 +20,7 @@ def assemble_pending_programme(programme: ProgrammeWithoutCuesheet) -> Programme
         "Veuillez patienter quelques minutes avant de rafraîchir. "
         "Wait a few minutes before refreshing.",
         author="Radio-Canada",
-        link="http://ici.radio-canada.ca" + programme.header.share.url,
+        link="http://ici.radio-canada.ca" + programme.canonical_url,
         image_url=programme.header.picture.url.replace("{0}",
                                                        "1400").replace("{1}", "1x1"))
 
@@ -33,7 +33,7 @@ def assemble_programme(programme: ProgrammeWithoutCuesheet,
         title=clean(programme.header.title),
         description=clean(programme.header.summary),
         author="Radio-Canada",
-        link="http://ici.radio-canada.ca" + programme.header.share.url,
+        link="http://ici.radio-canada.ca" + programme.canonical_url,
         image_url=programme.header.picture.url.replace("{0}",
                                                        "1400").replace("{1}", "1x1"))
 

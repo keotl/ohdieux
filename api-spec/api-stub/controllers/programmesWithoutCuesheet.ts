@@ -1,4 +1,4 @@
-import { Controller, Get, Path, Route } from "tsoa";
+import { Controller, Get, Path, Route, Query } from "tsoa";
 import {
   ContentType,
   EpisodeId,
@@ -17,6 +17,7 @@ export class ProgrammesWithoutCuesheetController extends Controller {
   public getProgrammeWithoutCuesheet(
     @Path() programmeId: string,
     @Path() pageNumber: number,
+    @Query() context: "web",
   ): Promise<ProgrammeWithoutCuesheet> {
     throw new Error();
   }
@@ -31,9 +32,6 @@ export type ProgrammeWithoutCuesheet = {
   header: {
     title: string;
     summary: string;
-    share: {
-      url: string;
-    };
     picture: {
       url: string;
     };
