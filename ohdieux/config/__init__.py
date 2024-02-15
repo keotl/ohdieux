@@ -12,8 +12,9 @@ from jivago.lang.annotations import Inject
 @Singleton
 class Config(object):
     cache_refresh_delay_s: int
-    fetch_threads: int
     cache_strategy: Literal["memory", "redis"]
+    user_agent: str
+    run_fetcher_worker: bool
 
     @Inject
     def __init__(self, application_properties: ApplicationProperties,
@@ -22,16 +23,17 @@ class Config(object):
             env.get("CACHE_REFRESH_DELAY") or \
             application_properties.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
             env.get("DELAI_RAFRAICHISSEMENT_CACHE") or \
-            86400)
-
-        self.fetch_threads = int(application_properties.get("FETCH_THREADS") or \
-            env.get("FETCH_THREADS") or \
-            application_properties.get("FILS_REQUETES") or \
-            env.get("FILS_REQUETES") or \
-            4)
+            3600 * 24 * 7)
 
         self.cache_strategy = application_properties.get("CACHE_STRATEGY") or \
             env.get("CACHE_STRATEGY") or \
             application_properties.get("STRATEGIE_CACHE") or \
             env.get("STRATEGIE_CACHE") or \
             "memory"
+
+        self.user_agent = application_properties.get("USER_AGENT") or \
+            env.get("USER_AGENT") or ""
+
+        self.run_fetcher_worker = (application_properties.get("RUN_FETCHER_WORKER")
+                                   or env.get("RUN_FETCHER_WORKER")
+                                   or "") in ("", "True", "true", "t", "1", "y", "yes")

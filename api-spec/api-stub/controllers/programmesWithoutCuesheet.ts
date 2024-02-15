@@ -1,9 +1,10 @@
-import { Controller, Get, Path, Route } from "tsoa";
+import { Controller, Get, Path, Route, Query } from "tsoa";
 import {
   ContentType,
   EpisodeId,
   FormattedFileSize,
   MediaId,
+  Pagination,
   ProgrammeId,
   QualifiedEpisodeId,
 } from "./types";
@@ -16,6 +17,7 @@ export class ProgrammesWithoutCuesheetController extends Controller {
   public getProgrammeWithoutCuesheet(
     @Path() programmeId: string,
     @Path() pageNumber: number,
+    @Query() context: "web",
   ): Promise<ProgrammeWithoutCuesheet> {
     throw new Error();
   }
@@ -27,13 +29,18 @@ export type Duration = {
 
 export type ProgrammeWithoutCuesheet = {
   canonicalUrl: string;
+  header: {
+    title: string;
+    summary: string;
+    picture: {
+      url: string;
+    };
+  };
   content: {
     contentDetail: {
+      pagedConfiguration: Pagination;
       items: {
         broadcastedFirstTimeAt: Date;
-        download: {
-          fileSizeInBytes: number;
-        };
         duration: Duration;
         globalId: {
           contentType: ContentType;
@@ -44,8 +51,8 @@ export type ProgrammeWithoutCuesheet = {
             contentType: ContentType;
             id: ProgrammeId;
           };
-          details: string;
-          download: {
+          details?: string;
+          download?: {
             fileSizeInBytes: number;
 
             /** Undefined if episode is composed of multiple audio files */
@@ -58,7 +65,6 @@ export type ProgrammeWithoutCuesheet = {
             contentType: ContentType;
             id: EpisodeId;
           };
-          id: MediaId;
 
           title: string;
         };
@@ -73,7 +79,7 @@ export type ProgrammeWithoutCuesheet = {
           mediaId?: MediaId;
           title: string;
         };
-        summary: string;
+        summary: string | undefined;
         title: string;
         url: string;
       }[];

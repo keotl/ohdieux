@@ -39,8 +39,8 @@ class InvalidationStrategy(object):
         self._logger.info(f"Checking staleness for programme {programme_id}.")
         newest_episode = self._fetcher.fetch_newest_episode(programme_id)
         stale = _is_stale(programme, newest_episode)
-        if not stale:
-            self._debouncer.set_last_checked_time(programme_id)
+
+        self._debouncer.set_last_checked_time(programme_id)
 
         return stale
 

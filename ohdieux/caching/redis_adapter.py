@@ -1,7 +1,7 @@
 import logging
 import time
-from typing import List, Optional
 import traceback
+from typing import List, Optional
 
 import redis
 from jivago.config.properties.system_environment_properties import \
@@ -37,16 +37,14 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
 
         self._connection = redis.StrictRedis(decode_responses=True,
                                              health_check_interval=5,
-                                             charset="utf-8").from_url(
-                                                 self._url)
+                                             charset="utf-8").from_url(self._url)
         self._connection.ping()
         self._logger.info("Established Redis connection.")
         self._pubsub = self._connection.pubsub()
 
     @Override
     def set(self, programme_id: int, programme: Programme):
-        self._connection.set(str(programme_id),
-                             self._mapper.serialize(programme))
+        self._connection.set(str(programme_id), self._mapper.serialize(programme))
 
     @Override
     def get(self, programme_id: int) -> Optional[Programme]:
@@ -56,7 +54,9 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
                 return None
             return self._mapper.deserialize(value.decode("utf-8"), Programme)
         except IncorrectAttributeTypeException:
-            self._logger.error(f"Deserialization error while reading programme {programme_id} from cache.")
+            self._logger.error(
+                f"Deserialization error while reading programme {programme_id} from cache."
+            )
             return None
 
     @Override
@@ -70,21 +70,18 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
             if saved is None:
                 pending = []
             else:
-                pending = self._mapper.deserialize(saved.decode("utf-8"),
-                                                   List[int])
+                pending = self._mapper.deserialize(saved.decode("utf-8"), List[int])
             if programme_id in pending:
                 pending.remove(programme_id)
                 self._connection.set("pending", self._mapper.serialize(pending))
 
-    def _mark_pending_and_should_send_refresh_message(
-            self, programme_id: int) -> bool:
+    def _mark_pending_and_should_send_refresh_message(self, programme_id: int) -> bool:
         with self._connection.lock("pending_lock", timeout=5):
             saved = self._connection.get("pending")
             if saved is None:
                 pending = []
             else:
-                pending = self._mapper.deserialize(saved.decode("utf-8"),
-                                                   List[int])
+                pending = self._mapper.deserialize(saved.decode("utf-8"), List[int])
             if programme_id in pending:
                 return False
 
@@ -107,6 +104,7 @@ class RedisRefreshListener(Runnable):
 
     @Override
     def run(self):
+        self._logger.info("Starting RedisRefreshListener")
         while True:
             try:
                 self._pubsub.subscribe("refresh_programme")
@@ -118,11 +116,15 @@ class RedisRefreshListener(Runnable):
                             programme_id):
                         self._event_bus.emit("refresh_programme", programme_id)
             except redis.exceptions.RedisError as e:
-                self._logger.warning(f"Redis connection closed. Restarting listener in 10 seconds... {e}")
+                self._logger.warning(
+                    f"Redis connection closed. Restarting listener in 10 seconds... {e}"
+                )
                 time.sleep(10)
                 continue
             except Exception as e:
-                self._logger.error(f"Uncaught exception in redis listener. Restarting in 10 seconds...", traceback.format_exc())
+                self._logger.error(
+                    f"Uncaught exception in redis listener. Restarting in 10 seconds...",
+                    traceback.format_exc())
                 time.sleep(10)
                 continue
 
@@ -142,6 +144,5 @@ class RedisPendingQueueJanitor(Runnable):
     def run(self):
         with self._redis._connection.lock("pending_lock", timeout=5):
             self._logger.info(
-                "Clearing pending programmes in case there are stray elements."
-            )
+                "Clearing pending programmes in case there are stray elements.")
             self._redis._connection.delete("pending")

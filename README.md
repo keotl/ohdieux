@@ -53,6 +53,5 @@ The table below is a complete list of the supported environment variables.
 | Propriété (FR)               | Property (EN)       | Description                                                                                                                                               |
 |:-----------------------------|:--------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | DELAI_RAFRAICHISSEMENT_CACHE | CACHE_REFRESH_DELAY | Délai au-delà duquel le flux RSS généré est considéré périmé et doit être regénéré. / Delay after which the cached RSS feed should be regenerated.        |
-| FILS_REQUETES                | FETCH_THREADS       | Nombre de requêtes à envoyer en parallèle à Ohdio. / Parallel requests to issue to Ohdio for scraping.                                                    |
 | STRATEGIE_CACHE              | CACHE_STRATEGY      | `"memory"`,`"redis"` Mécanisme de cache. Pour redis, `REDIS_URL` doit être fourni. / Caching provider. If using redis, `REDIS_URL` must also be provided. |
 
