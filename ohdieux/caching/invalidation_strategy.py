@@ -5,10 +5,12 @@ from typing import Optional
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 from jivago.lang.stream import Stream
+from ohdieux.caching.refresh_whitelist import RefreshWhitelist
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor
 from ohdieux.model.programme import Programme
+from ohdieux.service.programme_blacklist import ProgrammeBlacklist
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 
 
@@ -17,13 +19,20 @@ class InvalidationStrategy(object):
 
     @Inject
     def __init__(self, fetcher: ProgrammeFetchingService, config: Config,
-                 debouncer: StalenessCheckDebouncer):
+                 debouncer: StalenessCheckDebouncer, whitelist: RefreshWhitelist,
+                 blacklist: ProgrammeBlacklist):
         self._fetcher = fetcher
         self._forced_cache_refresh_delay = config.cache_refresh_delay_s
         self._debouncer = debouncer
+        self._whitelist = whitelist
+        self._blacklist = blacklist
         self._logger = logging.getLogger(self.__class__.__name__)
 
     def should_refresh(self, programme_id: int, programme: Optional[Programme]) -> bool:
+        if not self._whitelist.allow_refresh(
+                str(programme_id)) or self._blacklist.is_blacklisted(programme_id):
+            return False
+
         if programme is None:
             return True
         if datetime.now() > programme.build_date + timedelta(

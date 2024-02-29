@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import threading
+from datetime import datetime
 from typing import Awaitable, Iterable, List, Optional, cast
 
 import ohdieux.ohdio.generated
@@ -35,6 +36,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         self.thread = threading.Thread(target=_run_loop, args=(self.event_loop, ))
         self.thread.start()
         self.user_agent = config.user_agent
+        self.proxy_url = config.proxy_url
+        self._api_base_url = config.api_base_url
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @Override
@@ -116,6 +119,38 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         finally:
             await api.api_client.close()
 
+    async def fetch_programme_incremental_async(self, programme_id: int,
+                                                programme: Programme) -> Programme:
+        api = self._create_api_client()
+        next_page: Optional[int] = 1
+        new_episodes: List[EpisodeDescriptor] = []
+        try:
+            while next_page != None:
+                page = await api.get_programme_without_cuesheet(str(programme_id),
+                                                                next_page,
+                                                                context="web")
+                if page.content.content_detail.paged_configuration.next_page_url:
+                    next_page += 1
+                else:
+                    next_page = None
+
+                for item in page.content.content_detail.items:
+                    episode = await self._fetch_episode_async(api, item)
+                    if not episode:
+                        raise Exception("Could not fetch episode")
+                    new_episodes.append(episode)
+
+                    if _is_same(episode, programme.episodes[0]):
+                        return Programme(programme.programme,
+                                         [*new_episodes, *programme.episodes[1:]],
+                                         datetime.now())
+
+        finally:
+            await api.api_client.close()
+
+        self._logger.error(f"Could not update pgoramme {programme_id} incrementally.")
+        return programme
+
     async def _fetch_episode_async(
         self, api: DefaultApi,
         episode: ProgrammeWithoutCuesheetContentContentDetailItemsInner
@@ -164,8 +199,10 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         return None
 
     def _create_api_client(self) -> DefaultApi:
-        api_client = ohdieux.ohdio.generated.ApiClient(
-            Configuration(host="https://services.radio-canada.ca"))
+        config = Configuration(host=self._api_base_url)
+        if self.proxy_url:
+            config.proxy = self.proxy_url  # type: ignore
+        api_client = ohdieux.ohdio.generated.ApiClient(config)
         api_client.user_agent = self.user_agent
         api = ohdieux.ohdio.generated.DefaultApi(api_client)
         return api
@@ -184,6 +221,10 @@ def _distinct(items: Iterable[str]) -> List[str]:
             seen.add(item)
             result.append(item)
     return result
+
+
+def _is_same(a: EpisodeDescriptor, b: EpisodeDescriptor) -> bool:
+    return a.guid == b.guid
 
 
 @PreShutdown
