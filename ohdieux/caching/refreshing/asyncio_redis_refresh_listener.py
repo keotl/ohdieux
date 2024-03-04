@@ -8,6 +8,7 @@ from jivago.event.synchronous_event_bus import SynchronousEventBus
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject
 from ohdieux.caching.invalidation_strategy import InvalidationStrategy
+from ohdieux.caching.programme_cache import ProgrammeCache
 from ohdieux.caching.redis_adapter import RedisAdapter
 from ohdieux.ohdio.asyncio_programme_fetcher import AsyncioProgrammeFetcher
 
@@ -17,12 +18,14 @@ class AsyncioRedisRefreshListener(object):
 
     @Inject
     def __init__(self, redis: RedisAdapter, fetcher: AsyncioProgrammeFetcher,
-                 event_bus: SynchronousEventBus, invalidation: InvalidationStrategy):
+                 event_bus: SynchronousEventBus, invalidation: InvalidationStrategy,
+                 cache: ProgrammeCache):
         self._redis = redis
         self._logger = logging.getLogger(self.__class__.__name__)
         self._should_stop = False
         self._fetcher = fetcher
         self._bus = event_bus
+        self._cache = cache
         self._invalidation = invalidation
 
     async def run_refresher(self):
@@ -57,9 +60,17 @@ class AsyncioRedisRefreshListener(object):
                     f"Skipping refreshing programme {programme_id} because it is not stale."
                 )
                 return
-            self._logger.info(f"Refreshing programme {programme_id}.")
+
             start = datetime.now()
-            result = await self._fetcher.fetch_entire_programme_async(programme_id)
+            cached = self._cache.get(programme_id)
+            if cached and len(cached.episodes) > 0:
+                self._logger.info(f"Refreshing programme {programme_id} incrementally.")
+                result = await self._fetcher.fetch_programme_incremental_async(
+                    programme_id, cached)
+            else:
+                self._logger.info(f"Refreshing programme {programme_id}.")
+                result = await self._fetcher.fetch_entire_programme_async(programme_id)
+
             self._redis.set(programme_id, result)
             self._logger.info(
                 f"Done refreshing programme {programme_id} in {datetime.now() - start}."

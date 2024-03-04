@@ -5,15 +5,16 @@ from jivago.inject.annotation import Component
 from jivago.lang.annotations import Inject, Override
 from ohdieux.caching.redis_adapter import RedisAdapter
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
+from ohdieux.config import Config
 
 
 @Component
 class RedisStalenessCheckDebouncer(StalenessCheckDebouncer):
 
     @Inject
-    def __init__(self, redis: RedisAdapter):
+    def __init__(self, redis: RedisAdapter, config: Config):
         self._redis = redis
-        self._check_delay = timedelta(minutes=5)
+        self._check_delay = timedelta(seconds=config.recheck_interval_s)
 
     @Override
     def set_last_checked_time(self, programme_id: int):

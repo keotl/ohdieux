@@ -2,18 +2,20 @@ import threading
 from datetime import datetime, timedelta
 
 from jivago.inject.annotation import Component, Singleton
-from jivago.lang.annotations import Override
+from jivago.lang.annotations import Inject, Override
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
+from ohdieux.config import Config
 
 
 @Component
 @Singleton
 class InmemoryStalenessCheckDebouncer(StalenessCheckDebouncer):
 
-    def __init__(self):
+    @Inject
+    def __init__(self, config: Config):
         self._content = {}
         self._lock = threading.Lock()
-        self._check_delay = timedelta(minutes=5)
+        self._check_delay = timedelta(seconds=config.recheck_interval_s)
 
     @Override
     def set_last_checked_time(self, programme_id: int):
