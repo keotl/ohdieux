@@ -29,7 +29,7 @@ describe("programmesWithoutCuesheet compliance test", () => {
 
 const api = new DefaultApi(
   new Configuration({
-    basePath: "https://services.radio-canada.ca",
+    basePath: process.env.API_BASE_URL || "https://services.radio-canada.ca",
     headers: { "User-Agent": process.env.USER_AGENT || "" },
   }),
 );
