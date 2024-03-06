@@ -124,11 +124,14 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         api = self._create_api_client()
         next_page: Optional[int] = 1
         new_episodes: List[EpisodeDescriptor] = []
+        first_page = None
         try:
             while next_page != None:
                 page = await api.get_programme_without_cuesheet(str(programme_id),
                                                                 next_page,
                                                                 context="web")
+                if first_page is None:
+                    first_page = page
                 if page.content.content_detail.paged_configuration.next_page_url:
                     next_page += 1
                 else:
@@ -141,9 +144,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
                     new_episodes.append(episode)
 
                     if _is_same(episode, programme.episodes[0]):
-                        return Programme(programme.programme,
-                                         [*new_episodes, *programme.episodes[1:]],
-                                         datetime.now())
+                        return assemble_programme(
+                            first_page, [*new_episodes, *programme.episodes[1:]])
 
         finally:
             await api.api_client.close()
