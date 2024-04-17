@@ -1,4 +1,4 @@
-gunicorn==20.1.0
+gunicorn==22.0.0
 git+https://github.com/keotl/jivago@develop
 #jivago==0.6.5
 MarkupSafe==2.1.1
