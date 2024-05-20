@@ -13,4 +13,4 @@ class StaticCacheHeadersFilter(Filter):
         chain.doFilter(request, response)
         if "Cache-Control" not in response.headers:
             response.headers[
-                "Cache-Control"] = "max-age=1800, stale-while-revalidate=60, stale-if-error=86400"
+                "Cache-Control"] = "max-age=3600, stale-while-revalidate=60, stale-if-error=86400"

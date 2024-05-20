@@ -65,5 +65,5 @@ def _response_headers(should_cache: bool) -> dict:
         return {"Cache-Control": "no-cache"}
 
     return {
-        "Cache-Control": "max-age=240, stale-while-revalidate=60, stale-if-error=86400"
+        "Cache-Control": "max-age=1800, stale-while-revalidate=60, stale-if-error=86400"
     }
