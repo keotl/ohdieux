@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-apk add openjdk18
+apk add openjdk21
 cd api-spec
 npm ci
 npm run tsoa
