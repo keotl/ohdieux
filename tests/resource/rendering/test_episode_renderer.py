@@ -45,7 +45,7 @@ class EpisodeRendererTests(unittest.TestCase):
         episode = EpisodeDescriptor("", "", "", datetime.now(), 123, [
             MediaDescriptor("example.com/mp4/file.mp4", "", 1),
             MediaDescriptor("untouched", "", 2)
-        ])
+        ], False)
         programme = Programme(PROGRAMME.programme, [episode], datetime.now())
         render = renderer(favor_aac=True)
 
@@ -71,11 +71,27 @@ class EpisodeRendererTests(unittest.TestCase):
         rendered_episodes = Stream(rendered_programme.episodes).toList()
         self.assertEqual(50, len(rendered_episodes))
 
+    def test_excludes_replays(self):
+        # Given
+        replay = EpisodeDescriptor(
+            "episode title", "description", "episodeid", datetime.now(), 123,
+            [MediaDescriptor("first", "", 1),
+             MediaDescriptor("second", "", 2)], True)
+        programme = Programme(PROGRAMME.programme, [replay], datetime.now())
+        render = renderer(exclude_replays=True)
+
+        # When
+        rendered_programme = render(programme)
+
+        # Then
+        rendered_episodes = list(rendered_programme.episodes)
+        self.assertEqual([], rendered_episodes)
+
 
 EPISODE = EpisodeDescriptor(
     "episode title", "description", "episodeid", datetime.now(), 123,
     [MediaDescriptor("first", "", 1),
-     MediaDescriptor("second", "", 2)])
+     MediaDescriptor("second", "", 2)], False)
 
 PROGRAMME = Programme(programme=ProgrammeDescriptor("title", "description", "author",
                                                     "link", "image_url"),

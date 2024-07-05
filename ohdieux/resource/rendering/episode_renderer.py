@@ -16,6 +16,7 @@ class RenderedEpisode(NamedTuple):
     duration: int
     media: MediaDescriptor
     source_episode_guid_: str
+    is_broadcast_replay: bool
 
 
 class RenderedProgramme(NamedTuple):
@@ -27,14 +28,16 @@ def renderer(*,
              tag_segments: bool = False,
              favor_aac: bool = False,
              reverse_segments: bool = False,
-             limit_episodes: bool = False):
+             limit_episodes: bool = False,
+             exclude_replays: bool = False):
     episode_transforms: List[Callable[[EpisodeDescriptor], EpisodeDescriptor]] = [
         _replace_mp4_url_for_aac if favor_aac else _noop,
         _reverse_episode_segments if reverse_segments else _noop
     ]
     programme_transforms: List[Callable[[RenderedProgramme], RenderedProgramme]] = [
         _tag_episode_title_with_segment_index if tag_segments else _noop,
-        _limit_episodes if limit_episodes else _noop
+        _limit_episodes if limit_episodes else _noop,
+        _exclude_replays if exclude_replays else _noop
     ]
 
     def _render_episode(episode: EpisodeDescriptor) -> List[RenderedEpisode]:
@@ -47,7 +50,9 @@ def renderer(*,
                                 date=formatdate(float(episode.date.strftime("%s"))),
                                 duration=episode.duration,
                                 media=stream,
-                                source_episode_guid_=episode.guid))
+                                source_episode_guid_=episode.guid,
+                                is_broadcast_replay=episode.is_broadcast_replay
+                                or False))
         return res
 
     def _render_programme(programme: Programme) -> RenderedProgramme:
@@ -75,7 +80,8 @@ def _replace_mp4_url_for_aac(episode: EpisodeDescriptor) -> EpisodeDescriptor:
                              guid=episode.guid,
                              date=episode.date,
                              duration=episode.duration,
-                             media=new_media)
+                             media=new_media,
+                             is_broadcast_replay=episode.is_broadcast_replay)
 
 
 def _noop(x, _=None):
@@ -99,20 +105,32 @@ def _tag_episode_title_with_segment_index(
                                   date=episode.date,
                                   duration=episode.duration,
                                   media=episode.media,
-                                  source_episode_guid_=episode.source_episode_guid_)
+                                  source_episode_guid_=episode.source_episode_guid_,
+                                  is_broadcast_replay=episode.is_broadcast_replay)
             index += 1
 
     return RenderedProgramme(programme.programme, _tag_episodes(programme.episodes))
 
 
 def _reverse_episode_segments(e: EpisodeDescriptor) -> EpisodeDescriptor:
-    return EpisodeDescriptor(e.title, e.description, e.guid, e.date, e.duration,
-                             list(reversed(e.media)))
+    return EpisodeDescriptor(title=e.title,
+                             description=e.description,
+                             guid=e.guid,
+                             date=e.date,
+                             duration=e.duration,
+                             media=list(reversed(e.media)),
+                             is_broadcast_replay=e.is_broadcast_replay)
 
 
 def _limit_episodes(programme: RenderedProgramme) -> RenderedProgramme:
     return RenderedProgramme(programme.programme,
                              Stream(programme.episodes).take(_EPISODE_LIMIT))
+
+
+def _exclude_replays(programme: RenderedProgramme) -> RenderedProgramme:
+    return RenderedProgramme(
+        programme.programme,
+        Stream(programme.episodes).filter(lambda e: not e.is_broadcast_replay))
 
 
 _EPISODE_LIMIT = 50
