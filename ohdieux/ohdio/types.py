@@ -44,7 +44,6 @@ class PlaylistItemId(TypedDict):
 
 class ProgrammeContentItem(TypedDict):
     duration: Duration
-    globalId: ContentGlobalId
     playlistItemId: PlaylistItemId
     summary: NotRequired[str]
     title: str

@@ -9,7 +9,7 @@ from ohdieux.caching.refresh_whitelist import RefreshWhitelist
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor
-from ohdieux.model.programme import Programme
+from ohdieux.model.programme import Programme, ProgrammeSummary
 from ohdieux.service.programme_blacklist import ProgrammeBlacklist
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 
@@ -46,23 +46,23 @@ class InvalidationStrategy(object):
 
     def _check_stale(self, programme_id: int, programme: Programme) -> bool:
         self._logger.info(f"Checking staleness for programme {programme_id}.")
-        newest_episode = self._fetcher.fetch_newest_episode(programme_id)
-        stale = _is_stale(programme, newest_episode)
+        summary = self._fetcher.fetch_programme_summary(programme_id)
+        stale = _is_stale(programme, summary)
 
         self._debouncer.set_last_checked_time(programme_id)
 
         return stale
 
 
-def _is_stale(old: Programme, new: Optional[EpisodeDescriptor]):
-    if new is None:
-        # Likely some transient error. Let's wait.
+def _is_stale(old: Programme, new: Optional[ProgrammeSummary]):
+    if new is None or new["episodes"] == 0:
         return False
-    if len(old.episodes) == 0:
+    if len(old.episodes) != new["episodes"]:
         return True
+
     latest_old_episode = old.episodes[0]
-    new_urls = Stream(new.media).map(lambda m: m.media_url).toList()
+    new_urls = list(map(lambda m: m.media_url, new["first_episodes"][0].media))
     old_urls = Stream(latest_old_episode.media).map(lambda m: m.media_url).toList()
 
-    return (new_urls != old_urls or new.title != latest_old_episode.title
-            or new.description != latest_old_episode.description)
+    return (new_urls != old_urls or new["title"] != latest_old_episode.title
+            or new["description"] != latest_old_episode.description)

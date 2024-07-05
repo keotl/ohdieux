@@ -78,5 +78,6 @@ class AsyncioRedisRefreshListener(object):
         except Exception as e:
             self._logger.error(
                 f"Uncaught exception while refreshing programme {programme_id} {e}")
+            traceback.print_exc()
         finally:
             self._bus.emit("refresh_complete", programme_id)
