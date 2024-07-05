@@ -76,6 +76,9 @@ class AsyncioRedisRefreshListener(object):
                     self._logger.error(
                         f"Programme {programme_id} is missing {missing_episodes}/{programme_summary['episodes']} episodes. Consider clearing cache manually."
                     )
+                    if programme_summary["episodes"] < 50:
+                        self._logger.info(f"Attempting to refetch full programme {programme_id}")
+                        result = await self._fetcher.fetch_entire_programme_async(programme_id)
 
             else:
                 self._logger.info(f"Refreshing programme {programme_id}.")

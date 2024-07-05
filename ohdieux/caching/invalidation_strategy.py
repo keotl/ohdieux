@@ -63,7 +63,7 @@ def _is_stale(old: Programme, new: Optional[ProgrammeSummary]):
         return True
 
     # Short programmes that we can refetch quickly
-    if len(old.episodes) < new["episodes"] < 25:
+    if len(old.episodes) < new["episodes"] < 50:
         return True
 
     # Default newest_to_oldest logic, check that the first episode is different.
