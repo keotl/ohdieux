@@ -88,7 +88,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             next_page: Optional[int] = 1
             episodes: List[Awaitable[Optional[EpisodeDescriptor]]] = []
             first_page = None
-            while next_page != None:
+            while next_page != None and len(episodes) < 9500:
                 page = await api.get_programme_by_id(programme_id, next_page)
                 if first_page is None:
                     first_page = page
