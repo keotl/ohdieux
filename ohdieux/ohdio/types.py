@@ -14,11 +14,9 @@ class ProgrammeHeader(TypedDict):
 
 
 class Pagination(TypedDict):
-    nextPageUrl: NotRequired[str]
     pageMaxLength: int
     pageNumber: int
     pageSize: int
-    previousPageUrl: NotRequired[str]
     totalNumberOfItems: int
 
 
@@ -61,6 +59,7 @@ class ProgrammeContent(TypedDict):
 
 
 class ProgrammeWithoutCuesheet(TypedDict):
+    typename: str
     canonicalUrl: str
     header: ProgrammeHeader
     primaryClassificationTagId: int

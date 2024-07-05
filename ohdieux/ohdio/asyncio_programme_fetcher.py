@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import threading
+import traceback
 from typing import Awaitable, Iterable, List, Literal, Optional, Sequence, cast
 
 from jivago.config.startup_hooks import PreShutdown
@@ -13,6 +14,7 @@ from ohdieux.model.programme import Programme, ProgrammeSummary
 from ohdieux.ohdio.api_client import ApiClient, FetchException
 from ohdieux.ohdio.assembler import (assemble_episode, assemble_pending_programme,
                                      assemble_programme)
+from ohdieux.ohdio.guess_programme_ordering import guess_programme_ordering
 from ohdieux.ohdio.parse_utils import clean
 from ohdieux.ohdio.types import ProgrammeContentItem
 from ohdieux.service.programme_fetching_service import (ProgrammeFetchingService,
@@ -57,6 +59,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             "first_episodes": episodes,
             "title": clean(programme["header"]["title"]),
             "description": clean(programme["header"]["summary"]),
+            "ordering": guess_programme_ordering(episodes)
         }
 
     @Override
@@ -93,8 +96,9 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
                     map(lambda item: self._fetch_episode_async(api, item),
                         page["content"]["contentDetail"]["items"]))
 
-                if page["content"]["contentDetail"]["pagedConfiguration"].get(
-                        "nextPageUrl"):
+                if page["content"]["contentDetail"]["pagedConfiguration"][
+                        "pageSize"] == page["content"]["contentDetail"][
+                            "pagedConfiguration"]["pageMaxLength"]:
                     next_page += 1
                 else:
                     next_page = None
@@ -115,15 +119,16 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         new_episodes: List[EpisodeDescriptor] = []
         first_page = None
         try:
-            while next_page != None:
+            while next_page is not None:
                 page = await api.get_programme_by_id(
                     programme_id,
                     next_page,
                 )
                 if first_page is None:
                     first_page = page
-                if page["content"]["contentDetail"]["pagedConfiguration"].get(
-                        "nextPageUrl"):
+                if page["content"]["contentDetail"]["pagedConfiguration"][
+                        "pageSize"] == page["content"]["contentDetail"][
+                            "pagedConfiguration"]["pageMaxLength"]:
                     next_page += 1
                 else:
                     next_page = None
@@ -139,6 +144,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         except:
             self._logger.error(
                 f"Could not update pgoramme {programme_id} incrementally.")
+            traceback.print_exc()
         return programme
 
     async def _fetch_episode_async(
@@ -149,8 +155,12 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             playback_list = await api.get_playback_list_by_id(
                 playback_list_item_id["contentType"]["id"],
                 str(playback_list_item_id["id"]))
+
             media_ids = _distinct(item["mediaPlaybackItem"]["mediaId"]
-                                  for item in playback_list["items"])
+                                  for item in playback_list["items"]
+                                  if item["mediaPlaybackItem"]["globalId"]["id"] ==
+                                  playback_list_item_id["id"])
+
             streams = await self._fetch_episode_streams_async(api, media_ids)
 
             return assemble_episode(episode, playback_list, streams)

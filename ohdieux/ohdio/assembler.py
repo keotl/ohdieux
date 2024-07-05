@@ -5,6 +5,7 @@ from jivago.lang.stream import Stream
 from ohdieux.model.episode_descriptor import EpisodeDescriptor, MediaDescriptor
 from ohdieux.model.programme import Programme
 from ohdieux.model.programme_descriptor import ProgrammeDescriptor
+from ohdieux.ohdio.guess_programme_ordering import guess_programme_ordering
 from ohdieux.ohdio.parse_utils import clean
 from ohdieux.ohdio.types import (PlaybackList, ProgrammeContentItem,
                                  ProgrammeWithoutCuesheet)
@@ -23,7 +24,7 @@ def assemble_pending_programme(programme: ProgrammeWithoutCuesheet) -> Programme
                                                                     "1400").replace(
                                                                         "{1}", "1x1"))
 
-    return Programme(programme_descriptor, [], datetime.now())
+    return Programme(programme_descriptor, [], datetime.now(), "unknown")
 
 
 def assemble_programme(programme: ProgrammeWithoutCuesheet,
@@ -37,7 +38,10 @@ def assemble_programme(programme: ProgrammeWithoutCuesheet,
                                                                     "1400").replace(
                                                                         "{1}", "1x1"))
 
-    return Programme(programme_descriptor, episodes, datetime.now())
+    return Programme(programme_descriptor,
+                     episodes,
+                     datetime.now(),
+                     ordering=guess_programme_ordering(episodes))
 
 
 def assemble_episode(episode: ProgrammeContentItem, playback_list: PlaybackList,

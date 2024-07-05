@@ -54,4 +54,4 @@ _blacklisted_programme = Programme(
     [
         EpisodeDescriptor("Programme inconnu / Unknown Programme", "", "000000",
                           datetime(2000, 1, 1), 1, [MediaDescriptor("", "", 1)], False)
-    ], datetime.now())
+    ], datetime.now(), "unknown")

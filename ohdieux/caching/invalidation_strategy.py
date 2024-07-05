@@ -57,12 +57,20 @@ class InvalidationStrategy(object):
 def _is_stale(old: Programme, new: Optional[ProgrammeSummary]):
     if new is None or new["episodes"] == 0:
         return False
-    if len(old.episodes) != new["episodes"]:
+
+    # oldest_to_newest, appear to mostly be short programmes
+    if old.ordering == "oldest_to_newest" and len(old.episodes) < new["episodes"]:
         return True
 
+    # Short programmes that we can refetch quickly
+    if len(old.episodes) < new["episodes"] < 25:
+        return True
+
+    # Default newest_to_oldest logic, check that the first episode is different.
     latest_old_episode = old.episodes[0]
     new_urls = list(map(lambda m: m.media_url, new["first_episodes"][0].media))
     old_urls = Stream(latest_old_episode.media).map(lambda m: m.media_url).toList()
 
-    return (new_urls != old_urls or new["title"] != latest_old_episode.title
-            or new["description"] != latest_old_episode.description)
+    return (new_urls != old_urls
+            or new["first_episodes"][0].title != latest_old_episode.title
+            or new["first_episodes"][0].description != latest_old_episode.description)

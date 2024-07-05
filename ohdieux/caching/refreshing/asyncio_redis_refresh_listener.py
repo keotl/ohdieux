@@ -63,10 +63,20 @@ class AsyncioRedisRefreshListener(object):
 
             start = datetime.now()
             cached = self._cache.get(programme_id)
-            if cached and len(cached.episodes) > 0:
+
+            if cached is not None and len(
+                    cached.episodes) > 0 and cached.ordering != "oldest_to_newest":
+
                 self._logger.info(f"Refreshing programme {programme_id} incrementally.")
                 result = await self._fetcher.fetch_programme_incremental_async(
                     programme_id, cached)
+                programme_summary = self._fetcher.fetch_programme_summary(programme_id)
+                missing_episodes = programme_summary["episodes"] - len(result.episodes)
+                if missing_episodes / (programme_summary["episodes"] or 1) > 0.1:
+                    self._logger.error(
+                        f"Programme {programme_id} is missing {missing_episodes}/{programme_summary['episodes']} episodes. Consider clearing cache manually."
+                    )
+
             else:
                 self._logger.info(f"Refreshing programme {programme_id}.")
                 result = await self._fetcher.fetch_entire_programme_async(programme_id)
