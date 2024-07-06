@@ -1,4 +1,10 @@
-from typing import List, TypedDict
+import sys
+from typing import List, Literal, Optional
+
+if sys.version_info >= (3, 12):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
 from typing_extensions import NotRequired
 
@@ -31,19 +37,18 @@ class ContentType(TypedDict):
 
 class ContentGlobalId(TypedDict):
     contentType: ContentType
-    id: int
+    id: str
 
 
 class PlaylistItemId(TypedDict):
     globalId2: ContentGlobalId
     hasTranscription: bool
-    mediaId: NotRequired[str]
 
 
 class ProgrammeContentItem(TypedDict):
     duration: Duration
     playlistItemId: PlaylistItemId
-    summary: NotRequired[str]
+    summary: NotRequired[Optional[str]]
     title: str
     url: str
     isBroadcastedReplay: bool
@@ -69,7 +74,7 @@ class ProgrammeWithoutCuesheet(TypedDict):
 class MediaPlaybackItem(TypedDict):
     mediaId: str
     globalId: ContentGlobalId
-    mediaSeekTime: int
+    mediaSeekTime: Optional[int]
 
 
 class PlaybackListItem(TypedDict):
@@ -78,11 +83,11 @@ class PlaybackListItem(TypedDict):
     duration: Duration
     title: str
     subtitle: str
+    appCode: Literal["medianet"]
 
 
 class PlaybackList(TypedDict):
     items: List[PlaybackListItem]
-    appCode: str
 
 
 class MediaStreamDescriptor(TypedDict):
