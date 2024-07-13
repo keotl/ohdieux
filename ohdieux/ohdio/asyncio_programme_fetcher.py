@@ -181,7 +181,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         for tech in TECHS:
             try:
                 stream = await api.get_media_stream(int(media_id), tech)
-                return stream["url"]
+                if stream.get("url"):
+                    return stream["url"]
             except ValidationError:
                 continue
             except FetchException:
