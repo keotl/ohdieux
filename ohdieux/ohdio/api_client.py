@@ -22,7 +22,7 @@ class ApiClient(object):
                 "extensions": json.dumps({
                     "persistedQuery": {
                         "version": 1,
-                        "sha256Hash": "35c11296552f4e3061a32a41d0da82ceec5ae2589b7b4979fdbd61ffd2ba640e"
+                        "sha256Hash": "7c1f3e0c576c2f82a45ef4a74026a41bd32e2cf4ebea974fadd22409a95e8ee3"
                     }
                 }),
                 "variables": json.dumps({
