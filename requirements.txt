@@ -12,4 +12,4 @@ async-timeout==4.0.2
 hiredis==2.2.3
 redis==4.5.5
 aiohttp==3.9.3
-pydantic==2.6.0
+pydantic==2.8.2

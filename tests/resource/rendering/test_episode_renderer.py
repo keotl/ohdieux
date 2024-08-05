@@ -45,8 +45,8 @@ class EpisodeRendererTests(unittest.TestCase):
         episode = EpisodeDescriptor("", "", "", datetime.now(), 123, [
             MediaDescriptor("example.com/mp4/file.mp4", "", 1),
             MediaDescriptor("untouched", "", 2)
-        ])
-        programme = Programme(PROGRAMME.programme, [episode], datetime.now())
+        ], False)
+        programme = Programme(PROGRAMME.programme, [episode], datetime.now(), ordering="unknown")
         render = renderer(favor_aac=True)
 
         # When
@@ -61,7 +61,7 @@ class EpisodeRendererTests(unittest.TestCase):
     def test_render_limit_number_of_episodes(self):
         # Given
         programme = Programme(PROGRAMME.programme, [EPISODE for _ in range(100)],
-                              datetime.now())
+                              datetime.now(), ordering="unknown")
         render = renderer(limit_episodes=True)
 
         # When
@@ -71,13 +71,29 @@ class EpisodeRendererTests(unittest.TestCase):
         rendered_episodes = Stream(rendered_programme.episodes).toList()
         self.assertEqual(50, len(rendered_episodes))
 
+    def test_excludes_replays(self):
+        # Given
+        replay = EpisodeDescriptor(
+            "episode title", "description", "episodeid", datetime.now(), 123,
+            [MediaDescriptor("first", "", 1),
+             MediaDescriptor("second", "", 2)], True)
+        programme = Programme(PROGRAMME.programme, [replay], datetime.now(), ordering="unknown")
+        render = renderer(exclude_replays=True)
+
+        # When
+        rendered_programme = render(programme)
+
+        # Then
+        rendered_episodes = list(rendered_programme.episodes)
+        self.assertEqual([], rendered_episodes)
+
 
 EPISODE = EpisodeDescriptor(
     "episode title", "description", "episodeid", datetime.now(), 123,
     [MediaDescriptor("first", "", 1),
-     MediaDescriptor("second", "", 2)])
+     MediaDescriptor("second", "", 2)], False)
 
 PROGRAMME = Programme(programme=ProgrammeDescriptor("title", "description", "author",
                                                     "link", "image_url"),
                       episodes=[EPISODE],
-                      build_date=datetime.now())
+                      build_date=datetime.now(), ordering="unknown")

@@ -1,8 +1,6 @@
 #!/bin/sh
+
 set -e
-apk add openjdk21
-cd api-spec
-npm ci
-npm run tsoa
-npm run apiclient:generate
-npm run test
+apk add git
+pip install -r requirements.txt
+python3 main_spec_test.py

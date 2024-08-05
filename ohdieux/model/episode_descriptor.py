@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Optional
 
 
 class MediaDescriptor(NamedTuple):
@@ -15,3 +15,4 @@ class EpisodeDescriptor(NamedTuple):
     date: datetime
     duration: int
     media: List[MediaDescriptor]
+    is_broadcast_replay: Optional[bool]

@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import List, Literal
 
 from jivago.config.properties.application_properties import \
     ApplicationProperties
@@ -15,7 +15,6 @@ class Config(object):
     recheck_interval_s: int
     cache_strategy: Literal["memory", "redis"]
     user_agent: str
-    proxy_url: Optional[str]
     run_fetcher_worker: bool
     use_refresh_whitelist: bool
     refresh_whitelist: List[str]
@@ -41,8 +40,6 @@ class Config(object):
             application_properties.get("STRATEGIE_CACHE") or \
             env.get("STRATEGIE_CACHE") or \
             "memory"
-
-        self.proxy_url = env.get("PROXY_URL")
 
         self.user_agent = application_properties.get("USER_AGENT") or \
             env.get("USER_AGENT") or ""

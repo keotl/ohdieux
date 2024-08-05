@@ -62,6 +62,12 @@
             Limiter nombre d'épisodes / Limit episode count
           </label>
         </div>
+        <div>
+          <input type="checkbox" id="exclude_replays" />
+          <label for="exclude_replays">
+            Exclure rediffusions / Exclude replays
+          </label>
+        </div>
       </div>
     </div>
     <br />
@@ -86,6 +92,9 @@
       }
       if (document.getElementById("limit_episodes").checked) {
         link = link + "&limit_episodes=true";
+      }
+      if (document.getElementById("exclude_replays").checked) {
+        link = link + "&exclude_replays=true";
       }
       document.getElementById("rss").href = link;
       document.getElementById("rss").innerHTML =

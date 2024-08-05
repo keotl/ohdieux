@@ -27,11 +27,13 @@ class RssResource(object):
                      reverse: OptionalQueryParam[str],
                      tag_segments: OptionalQueryParam[str],
                      favor_aac: OptionalQueryParam[str],
-                     limit_episodes: OptionalQueryParam[str], request: Request):
+                     limit_episodes: OptionalQueryParam[str],
+                     exclude_replays: OptionalQueryParam[str], request: Request):
         _reverse = parse_bool(reverse)
         _tag_segments = parse_bool(tag_segments)
         _favor_aac = parse_bool(favor_aac)
         _limit_episodes = parse_bool(limit_episodes)
+        _exclude_replays = parse_bool(exclude_replays)
 
         self._logger.info(
             f"GET /rss?programme_id={programme_id} {request.headers['User-Agent']}")
@@ -43,7 +45,8 @@ class RssResource(object):
         rendered_programme = renderer(tag_segments=_tag_segments,
                                       favor_aac=_favor_aac,
                                       reverse_segments=_reverse,
-                                      limit_episodes=_limit_episodes)(programme)
+                                      limit_episodes=_limit_episodes,
+                                      exclude_replays=_exclude_replays)(programme)
 
         rendered_episodes = Stream(rendered_programme.episodes).toList()
 
