@@ -143,7 +143,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
                             first_page, [*new_episodes, *programme.episodes[1:]])
         except:
             self._logger.error(
-                f"Could not update pgoramme {programme_id} incrementally.")
+                f"Could not update programme {programme_id} incrementally.")
             traceback.print_exc()
         return programme
 
@@ -155,11 +155,12 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             playback_list = await api.get_playback_list_by_id(
                 playback_list_item_id["contentType"]["id"],
                 str(playback_list_item_id["id"]))
+            if len(playback_list["items"]) == 0:
+                self._logger.warning("Got no media ids for episode %s",
+                                     episode["playlistItemId"]["globalId2"])
 
             media_ids = _distinct(item["mediaPlaybackItem"]["mediaId"]
-                                  for item in playback_list["items"]
-                                  if item["mediaPlaybackItem"]["globalId"]["id"] ==
-                                  playback_list_item_id["id"])
+                                  for item in playback_list["items"])
 
             streams = await self._fetch_episode_streams_async(api, media_ids)
 

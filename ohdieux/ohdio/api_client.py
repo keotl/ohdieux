@@ -3,6 +3,7 @@ import logging
 from typing import Literal
 
 import aiohttp
+from ohdieux.ohdio.parse_utils import filter_playbacklist_items_by_episode_id
 from ohdieux.ohdio.types import (MediaStreamDescriptor, PlaybackList,
                                  ProgrammeWithoutCuesheet)
 
@@ -22,13 +23,13 @@ class ApiClient(object):
                 "extensions": json.dumps({
                     "persistedQuery": {
                         "version": 1,
-                        "sha256Hash": "7c1f3e0c576c2f82a45ef4a74026a41bd32e2cf4ebea974fadd22409a95e8ee3"
+                        "sha256Hash": "f958bc063ecef0f9455ccb8acd36dee567b3ad0ca141b0774632f8a3a1766fb3"
                     }
                 }),
                 "variables": json.dumps({
                     "params": {
                         "context": "web",
-                        "forceWithoutCueSheet": False,
+                        "forceWithoutCueSheet": True,
                         "id": programme_id,
                         "pageNumber": page_number
                     }
@@ -36,8 +37,11 @@ class ApiClient(object):
             })
         return response["data"]["programmeById"]
 
-    async def get_playback_list_by_id(self, content_type_id: int,
-                                      playback_list_id: str) -> PlaybackList:
+    async def get_playback_list_by_id(
+            self,
+            content_type_id: int,
+            playback_list_id: str,
+            filter_related_episodes: bool = True) -> PlaybackList:
         response = await self._do_request(
             "GET", "/bff/audio/graphql", {
                 "opname": "playbackListByGlobalId",
@@ -54,6 +58,10 @@ class ApiClient(object):
                     }
                 })
             })
+        if filter_related_episodes:
+            return filter_playbacklist_items_by_episode_id(
+                playback_list_id, response["data"]["playbackListByGlobalId"])
+
         return response["data"]["playbackListByGlobalId"]
 
     async def get_media_stream(
@@ -88,4 +96,3 @@ class ApiClient(object):
 
 class FetchException(Exception):
     pass
-
