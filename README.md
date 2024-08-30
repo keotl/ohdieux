@@ -35,10 +35,8 @@ be consumed in any third-party app, such as Apple Podcasts.
 **Oh**dieux can be run locally in a Python environment.
 
 ```bash
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python3 main.py
+pipenv install --dev
+pipenv run start
 ```
 
 ### Configuration
