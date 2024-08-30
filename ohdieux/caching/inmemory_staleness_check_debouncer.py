@@ -27,5 +27,4 @@ class InmemoryStalenessCheckDebouncer(StalenessCheckDebouncer):
         with self._lock:
             if programme_id not in self._content:
                 return True
-            return datetime.now(
-            ) > self._content[programme_id] + self._check_delay
+            return datetime.now() > self._content[programme_id] + self._check_delay

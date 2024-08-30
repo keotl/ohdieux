@@ -45,9 +45,9 @@ class AsyncioRedisRefreshListener(object):
                 )
                 await asyncio.sleep(10)
                 continue
-            except Exception as e:
+            except Exception:
                 self._logger.error(
-                    f"Uncaught exception in redis listener. Restarting in 10 seconds...",
+                    "Uncaught exception in redis listener. Restarting in 10 seconds...",
                     traceback.format_exc())
                 await asyncio.sleep(10)
                 continue
@@ -77,8 +77,10 @@ class AsyncioRedisRefreshListener(object):
                         f"Programme {programme_id} is missing {missing_episodes}/{programme_summary['episodes']} episodes. Consider clearing cache manually."
                     )
                     if programme_summary["episodes"] < 50:
-                        self._logger.info(f"Attempting to refetch full programme {programme_id}")
-                        result = await self._fetcher.fetch_entire_programme_async(programme_id)
+                        self._logger.info(
+                            f"Attempting to refetch full programme {programme_id}")
+                        result = await self._fetcher.fetch_entire_programme_async(
+                            programme_id)
 
             else:
                 self._logger.info(f"Refreshing programme {programme_id}.")

@@ -8,8 +8,7 @@ from jivago.wsgi.request.response import Response
 @Component
 class StaticCacheHeadersFilter(Filter):
 
-    def doFilter(self, request: Request, response: Response,
-                 chain: FilterChain):
+    def doFilter(self, request: Request, response: Response, chain: FilterChain):
         chain.doFilter(request, response)
         if "Cache-Control" not in response.headers:
             response.headers[

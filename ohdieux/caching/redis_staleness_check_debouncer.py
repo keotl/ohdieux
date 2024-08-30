@@ -31,6 +31,6 @@ class RedisStalenessCheckDebouncer(StalenessCheckDebouncer):
                 saved.decode("utf-8")) + self._check_delay
         except KeyboardInterrupt as e:
             raise e
-        except Exception as e:
+        except Exception:
             traceback.print_exc()
             return True

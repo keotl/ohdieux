@@ -11,6 +11,5 @@ class IndexResource(object):
     def get(self):
         return Response(
             200, {
-                "Cache-Control":
-                "max-age=1800, stale-while-revalidate=60, stale-if-error=86400"
+                "Cache-Control": "max-age=1800, stale-while-revalidate=60, stale-if-error=86400"
             }, RenderedView("index.html", {}))

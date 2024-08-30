@@ -13,7 +13,7 @@ def guess_programme_ordering(
     for episode in episodes:
         if abs(ordering_guess) > 5:
             break
-        
+
         if episode.is_broadcast_replay:
             continue
 
@@ -21,9 +21,11 @@ def guess_programme_ordering(
             previous_timestamp = episode.date
 
         else:
-            if previous_timestamp.astimezone(timezone.utc) < episode.date.astimezone(timezone.utc):
+            if previous_timestamp.astimezone(timezone.utc) < episode.date.astimezone(
+                    timezone.utc):
                 ordering_guess += 1
-            elif previous_timestamp.astimezone(timezone.utc) > episode.date.astimezone(timezone.utc):
+            elif previous_timestamp.astimezone(timezone.utc) > episode.date.astimezone(
+                    timezone.utc):
                 ordering_guess -= 1
 
             previous_timestamp = episode.date

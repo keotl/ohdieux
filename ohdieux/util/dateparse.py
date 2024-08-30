@@ -1,4 +1,3 @@
-import json
 import re
 from datetime import datetime
 from typing import Optional
@@ -50,7 +49,8 @@ def parse_fr_date(formatted: str) -> datetime:
 def infer_fr_date(item: dict) -> datetime:
     x = SafeDict(item)
     if 'broadcastedFirstTimeAt' in item:
-        return datetime.strptime(item["broadcastedFirstTimeAt"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        return datetime.strptime(item["broadcastedFirstTimeAt"],
+                                 '%Y-%m-%dT%H:%M:%S.%fZ')
     else:
         candidates = [
             x["media2"]["details"].value(),
@@ -59,7 +59,8 @@ def infer_fr_date(item: dict) -> datetime:
             x["header"]["media2"]["title"].value(),
         ]
         try:
-            return Stream(candidates).map(extract_tentative_date).filter(lambda x: x is not None).max()
+            return Stream(candidates).map(extract_tentative_date).filter(
+                lambda x: x is not None).max()
         except:
             return datetime(year=2000, month=1, day=1)
 

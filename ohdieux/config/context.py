@@ -72,8 +72,7 @@ def configure_cache(config: Config, service_locator: ServiceLocator) -> Programm
 
 @Provider
 def configure_staleness_check(
-        config: Config,
-        service_locator: ServiceLocator) -> StalenessCheckDebouncer:
+        config: Config, service_locator: ServiceLocator) -> StalenessCheckDebouncer:
     if config.cache_strategy == "memory":
         return service_locator.get(InmemoryStalenessCheckDebouncer)
     elif config.cache_strategy == "redis":
@@ -82,9 +81,8 @@ def configure_staleness_check(
 
 
 @Provider
-def configure_notifier(
-        config: Config,
-        service_locator: ServiceLocator) -> ProgrammeRefreshNotifier:
+def configure_notifier(config: Config,
+                       service_locator: ServiceLocator) -> ProgrammeRefreshNotifier:
     if config.cache_strategy == "memory":
         return service_locator.get(InProcessRefreshNotifier)
     elif config.cache_strategy == "redis":

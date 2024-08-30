@@ -16,8 +16,7 @@ from ohdieux.communication.programme_refresh_notifier import \
 class MetricsResource(object):
 
     @Inject
-    def __init__(self, notifier: ProgrammeRefreshNotifier,
-                 cache: ProgrammeCache):
+    def __init__(self, notifier: ProgrammeRefreshNotifier, cache: ProgrammeCache):
         self._notifier = notifier
         self._cache = cache
 
@@ -32,7 +31,6 @@ class MetricsResource(object):
                 for programme_id, p in self._cache._content.items()
             }
         if isinstance(self._notifier, RedisAdapter):
-            res["pending"] = json.loads(
-                (self._notifier._connection.get("pending")
-                 or b"[]").decode("utf-8"))
+            res["pending"] = json.loads((self._notifier._connection.get("pending")
+                                         or b"[]").decode("utf-8"))
         return res

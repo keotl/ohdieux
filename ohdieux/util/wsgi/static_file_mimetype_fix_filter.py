@@ -10,8 +10,7 @@ from jivago.wsgi.request.response import Response
 class StaticFileMimetypeFixFilter(Filter):
 
     @Override
-    def doFilter(self, request: Request, response: Response,
-                 chain: FilterChain):
+    def doFilter(self, request: Request, response: Response, chain: FilterChain):
         chain.doFilter(request, response)
         if request.path.endswith(".js"):
             response.headers["Content-Type"] = "text/javascript"

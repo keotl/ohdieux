@@ -20,9 +20,8 @@ def assemble_pending_programme(programme: ProgrammeWithoutCuesheet) -> Programme
         "Wait a few minutes before refreshing.",
         author="Radio-Canada",
         link="https://ici.radio-canada.ca/ohdio" + programme["canonicalUrl"],
-        image_url=programme["header"]["picture"]["pattern"].replace("{width}",
-                                                                    "1400").replace(
-                                                                        "{ratio}", "1x1"))
+        image_url=programme["header"]["picture"]["pattern"].replace(
+            "{width}", "1400").replace("{ratio}", "1x1"))
 
     return Programme(programme_descriptor, [], datetime.now(), "unknown")
 
@@ -34,9 +33,8 @@ def assemble_programme(programme: ProgrammeWithoutCuesheet,
         description=clean(programme["header"]["summary"]),
         author="Radio-Canada",
         link="https://ici.radio-canada.ca/ohdio" + programme["canonicalUrl"],
-        image_url=programme["header"]["picture"]["pattern"].replace("{width}",
-                                                                    "1400").replace(
-                                                                        "{ratio}", "1x1"))
+        image_url=programme["header"]["picture"]["pattern"].replace(
+            "{width}", "1400").replace("{ratio}", "1x1"))
 
     return Programme(programme_descriptor,
                      episodes,

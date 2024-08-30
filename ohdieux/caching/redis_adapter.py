@@ -32,8 +32,8 @@ class RedisAdapter(ProgrammeCache, ProgrammeRefreshNotifier):
         self._mapper = ObjectMapper()
 
         if not self._url:
-            self._logger.fatal(f"Missing REDIS_URL environment variable.")
-            raise Exception(f"Missing REDIS_URL environment variable.")
+            self._logger.fatal("Missing REDIS_URL environment variable.")
+            raise Exception("Missing REDIS_URL environment variable.")
 
         self._connection = redis.StrictRedis(decode_responses=True,
                                              health_check_interval=5,
@@ -121,9 +121,9 @@ class RedisRefreshListener(Runnable):
                 )
                 time.sleep(10)
                 continue
-            except Exception as e:
+            except Exception:
                 self._logger.error(
-                    f"Uncaught exception in redis listener. Restarting in 10 seconds...",
+                    "Uncaught exception in redis listener. Restarting in 10 seconds...",
                     traceback.format_exc())
                 time.sleep(10)
                 continue

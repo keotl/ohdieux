@@ -9,8 +9,8 @@ from jivago.lang.annotations import Inject
 
 from ohdieux.caching.invalidation_strategy import InvalidationStrategy
 from ohdieux.caching.programme_cache import ProgrammeCache
-from ohdieux.service.programme_fetching_service import (
-    ProgrammeFetchingService, ProgrammeNotFoundException)
+from ohdieux.service.programme_fetching_service import (ProgrammeFetchingService,
+                                                        ProgrammeNotFoundException)
 
 
 @Component
@@ -18,8 +18,8 @@ from ohdieux.service.programme_fetching_service import (
 class ProgrammeRefresher(object):
 
     @Inject
-    def __init__(self, fetcher: ProgrammeFetchingService,
-                 cache: ProgrammeCache, event_bus: SynchronousEventBus,
+    def __init__(self, fetcher: ProgrammeFetchingService, cache: ProgrammeCache,
+                 event_bus: SynchronousEventBus,
                  invalidation_strategy: InvalidationStrategy):
         self._fetcher = fetcher
         self._cache = cache
@@ -30,8 +30,8 @@ class ProgrammeRefresher(object):
     @EventHandler("refresh_programme")
     def do_refresh(self, programme_id: int):
         try:
-            if not self._invalidation.should_refresh(
-                    programme_id, self._cache.get(programme_id)):
+            if not self._invalidation.should_refresh(programme_id,
+                                                     self._cache.get(programme_id)):
                 return
             self._logger.info(f"Refreshing programme {programme_id}.")
             start = datetime.now()
@@ -41,8 +41,7 @@ class ProgrammeRefresher(object):
                 f"Done refreshing programme {programme_id} in {datetime.now() - start}."
             )
         except ProgrammeNotFoundException:
-            self._logger.info(
-                f"Could not find programme {programme_id}. Ignoring.")
+            self._logger.info(f"Could not find programme {programme_id}. Ignoring.")
         except KeyboardInterrupt as e:
             raise e
         except Exception:

@@ -56,6 +56,7 @@ class Config(object):
         self.refresh_whitelist = (application_properties.get("REFRESH_WHITELIST")
                                   or env.get("REFRESH_WHITELIST") or "").split(",")
         self.programme_blacklist = (application_properties.get("PROGRAMME_BLACKLIST")
-                                  or env.get("PROGRAMME_BLACKLIST") or "").split(",")
+                                    or env.get("PROGRAMME_BLACKLIST") or "").split(",")
 
-        self.api_base_url = env.get("API_BASE_URL") or "https://services.radio-canada.ca"
+        self.api_base_url = env.get(
+            "API_BASE_URL") or "https://services.radio-canada.ca"

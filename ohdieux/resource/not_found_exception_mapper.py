@@ -15,5 +15,4 @@ class ProgrammeNotFoundExceptionMapper(ExceptionMapper):
         return isinstance(exception, ProgrammeNotFoundException)
 
     def create_response(self, exception: Exception) -> Response:
-        return Response(400, {},
-                        "Unknown programme ID.\nID Programme inconnu.")
+        return Response(400, {}, "Unknown programme ID.\nID Programme inconnu.")

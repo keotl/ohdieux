@@ -8,7 +8,6 @@ from jivago.lang.stream import Stream
 from ohdieux.caching.refresh_whitelist import RefreshWhitelist
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
 from ohdieux.config import Config
-from ohdieux.model.episode_descriptor import EpisodeDescriptor
 from ohdieux.model.programme import Programme, ProgrammeSummary
 from ohdieux.service.programme_blacklist import ProgrammeBlacklist
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService

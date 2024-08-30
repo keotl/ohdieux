@@ -2,6 +2,7 @@ import unittest
 
 from ohdieux.util.xml import unsafe_strip_tags
 
+
 class StripXmlTests(unittest.TestCase):
 
     def test_strip_tags(self):

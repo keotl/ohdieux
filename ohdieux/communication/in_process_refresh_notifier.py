@@ -8,6 +8,7 @@ from jivago.lang.annotations import Inject, Override
 from ohdieux.communication.programme_refresh_notifier import \
     ProgrammeRefreshNotifier
 
+
 @Component
 @Singleton
 # @EventHandlerClass # Configured dynamically in context.py
