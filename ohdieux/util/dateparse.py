@@ -41,7 +41,7 @@ def parse_fr_date(formatted: str) -> datetime:
     day, month, year = formatted.lower().split(" ")
     try:
         return datetime(int(year), MONTHS[month], int(day.rstrip("er")))
-    except:
+    except Exception:
         pass
     return datetime(int(year), ABBR_MONTHS[month], int(day.rstrip("er")))
 
@@ -59,9 +59,9 @@ def infer_fr_date(item: dict) -> datetime:
             x["header"]["media2"]["title"].value(),
         ]
         try:
-            return Stream(candidates).map(extract_tentative_date).filter(
-                lambda x: x is not None).max()
-        except:
+            return Stream(candidates).map(str).map(extract_tentative_date).filter(
+                lambda x: x is not None).max()  # type: ignore
+        except Exception:
             return datetime(year=2000, month=1, day=1)
 
 
@@ -71,6 +71,6 @@ def extract_tentative_date(text: str) -> Optional[datetime]:
             match = re.search(r"\d{1,2}(er)? (" + month + r") \d{2,4}", text)
             if match:
                 return parse_fr_date(match.group())
-        except:
+        except Exception:
             continue
     return None

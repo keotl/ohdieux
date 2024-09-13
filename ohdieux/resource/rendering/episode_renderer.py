@@ -84,7 +84,10 @@ def _replace_mp4_url_for_aac(episode: EpisodeDescriptor) -> EpisodeDescriptor:
                              is_broadcast_replay=episode.is_broadcast_replay)
 
 
-def _noop(x, _=None):
+T = TypeVar("T")
+
+
+def _noop(x: T, _=None) -> T:
     return x
 
 

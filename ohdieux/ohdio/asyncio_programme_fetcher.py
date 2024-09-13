@@ -88,7 +88,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             next_page: Optional[int] = 1
             episodes: List[Awaitable[Optional[EpisodeDescriptor]]] = []
             first_page = None
-            while next_page != None and len(episodes) < 9500:
+            while next_page is not None and len(episodes) < 9500:
                 page = await api.get_programme_by_id(programme_id, next_page)
                 if first_page is None:
                     first_page = page
@@ -141,7 +141,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
                     if _is_same(episode, programme.episodes[0]):
                         return assemble_programme(
                             first_page, [*new_episodes, *programme.episodes[1:]])
-        except:
+        except Exception:
             self._logger.error(
                 f"Could not update programme {programme_id} incrementally.")
             traceback.print_exc()

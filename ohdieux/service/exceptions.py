@@ -1,6 +1,7 @@
 from jivago.inject.annotation import Component
 from jivago.lang.annotations import Override
-from jivago.wsgi.filter.system_filters.error_handling.exception_mapper import ExceptionMapper
+from jivago.wsgi.filter.system_filters.error_handling.exception_mapper import \
+    ExceptionMapper
 from jivago.wsgi.request.response import Response
 
 
@@ -18,7 +19,7 @@ class ManifestGenerationExceptionMapper(ExceptionMapper):
         return isinstance(exception, ManifestGenerationException)
 
     @Override
-    def create_response(self, exception: Exception) -> Response:
+    def create_response(self, exception: ManifestGenerationException) -> Response:
         return Response(
             400, {}, """Une erreur est survenue lors de la conversion. 
 Si l'erreur persiste, veuillez coller le message ci-dessous dans un rapport d'anomalie au https://github.com/keotl/ohdieux/issues

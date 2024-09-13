@@ -21,8 +21,9 @@ def guess_programme_ordering(
             previous_timestamp = episode.date
 
         else:
-            if previous_timestamp.astimezone(timezone.utc) < episode.date.astimezone(
-                    timezone.utc):
+
+            if previous_timestamp.astimezone(  # type: ignore[unreachable]
+                    timezone.utc) < episode.date.astimezone(timezone.utc):
                 ordering_guess += 1
             elif previous_timestamp.astimezone(timezone.utc) > episode.date.astimezone(
                     timezone.utc):
