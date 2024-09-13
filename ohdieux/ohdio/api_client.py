@@ -34,7 +34,7 @@ class ApiClient(object):
                         "pageNumber": page_number
                     }
                 })
-            })
+            }, headers={"Content-Type": "application/json"})
         return response["data"]["programmeById"]
 
     async def get_playback_list_by_id(
@@ -57,7 +57,7 @@ class ApiClient(object):
                         "id": playback_list_id
                     }
                 })
-            })
+            }, headers={"Content-Type": "application/json"})
         if filter_related_episodes:
             return filter_playbacklist_items_by_episode_id(
                 playback_list_id, response["data"]["playbackListByGlobalId"])
@@ -79,13 +79,13 @@ class ApiClient(object):
             })
 
     async def _do_request(self, method: Literal["GET", "POST"], path: str,
-                          params: dict):
+                          params: dict, headers: dict = {}):
         self._logger.debug(
             f"Issuing request {self._base_url}{path}?{params.get('opname') or json.dumps(params)}"
         )
         async with aiohttp.ClientSession() as session:
             async with session.request(method, f"{self._base_url}{path}",
-                                       params=params) as response:
+                                       params=params, headers={"User-Agent": self._user_agent, **headers}) as response:
                 if response.status >= 400:
                     self._logger.warning(
                         f"Got error on {path}{params} – {response.status}")
