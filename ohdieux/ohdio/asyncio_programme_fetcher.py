@@ -11,11 +11,12 @@ from jivago.lang.runnable import Runnable
 from ohdieux.config import Config
 from ohdieux.model.episode_descriptor import EpisodeDescriptor
 from ohdieux.model.programme import Programme, ProgrammeSummary
-from ohdieux.ohdio.api_client import ApiClient, FetchException
+from ohdieux.ohdio.api_client import ApiClient, FetchException, ProgrammeType
 from ohdieux.ohdio.assembler import (assemble_episode, assemble_pending_programme,
                                      assemble_programme)
 from ohdieux.ohdio.guess_programme_ordering import guess_programme_ordering
 from ohdieux.ohdio.parse_utils import clean
+from ohdieux.ohdio.programme_type import infer_programme_type
 from ohdieux.ohdio.types import ProgrammeContentItem
 from ohdieux.service.programme_fetching_service import (ProgrammeFetchingService,
                                                         ProgrammeNotFoundException)
@@ -36,15 +37,17 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @Override
-    def fetch_programme_summary(self, programme_id: int) -> ProgrammeSummary:
+    def fetch_programme_summary(self, programme_id: int,
+                                programme_type: ProgrammeType) -> ProgrammeSummary:
         res = asyncio.run_coroutine_threadsafe(
-            self.fetch_programme_summary_async(programme_id), self.event_loop)
+            self.fetch_programme_summary_async(programme_id, programme_type),
+            self.event_loop)
         return res.result()
 
-    async def fetch_programme_summary_async(self,
-                                            programme_id: int) -> ProgrammeSummary:
+    async def fetch_programme_summary_async(
+            self, programme_id: int, programme_type: ProgrammeType) -> ProgrammeSummary:
         api = self._create_api_client()
-        programme = await api.get_programme_by_id(programme_id, 1)
+        programme = await api.get_programme_by_id(programme_id, 1, programme_type)
 
         episodes = []
 
@@ -77,7 +80,7 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
     async def fetch_slim_programme_async(self, programme_id: int) -> Programme:
         api = self._create_api_client()
         try:
-            response = await api.get_programme_by_id(programme_id, 1)
+            response = await api.get_programme_by_id(programme_id, 1, None)
             return assemble_pending_programme(response)
         except FetchException:
             raise ProgrammeNotFoundException(programme_id)
@@ -88,10 +91,16 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
             next_page: Optional[int] = 1
             episodes: List[Awaitable[Optional[EpisodeDescriptor]]] = []
             first_page = None
+            programme_type = None
             while next_page is not None and len(episodes) < 9500:
-                page = await api.get_programme_by_id(programme_id, next_page)
+                page = await api.get_programme_by_id(programme_id, next_page,
+                                                     programme_type)
                 if first_page is None:
                     first_page = page
+                if programme_type is None:
+                    programme_type = infer_programme_type(
+                        assemble_programme(first_page, []))
+
                 episodes.extend(
                     map(lambda item: self._fetch_episode_async(api, item),
                         page["content"]["contentDetail"]["items"]))
@@ -120,10 +129,8 @@ class AsyncioProgrammeFetcher(ProgrammeFetchingService):
         first_page = None
         try:
             while next_page is not None:
-                page = await api.get_programme_by_id(
-                    programme_id,
-                    next_page,
-                )
+                page = await api.get_programme_by_id(programme_id, next_page,
+                                                     infer_programme_type(programme))
                 if first_page is None:
                     first_page = page
                 if page["content"]["contentDetail"]["pagedConfiguration"][

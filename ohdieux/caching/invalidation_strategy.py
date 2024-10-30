@@ -9,6 +9,7 @@ from ohdieux.caching.refresh_whitelist import RefreshWhitelist
 from ohdieux.caching.staleness_check_debouncer import StalenessCheckDebouncer
 from ohdieux.config import Config
 from ohdieux.model.programme import Programme, ProgrammeSummary
+from ohdieux.ohdio.programme_type import infer_programme_type
 from ohdieux.service.programme_blacklist import ProgrammeBlacklist
 from ohdieux.service.programme_fetching_service import ProgrammeFetchingService
 
@@ -45,7 +46,8 @@ class InvalidationStrategy(object):
 
     def _check_stale(self, programme_id: int, programme: Programme) -> bool:
         self._logger.info(f"Checking staleness for programme {programme_id}.")
-        summary = self._fetcher.fetch_programme_summary(programme_id)
+        summary = self._fetcher.fetch_programme_summary(programme_id,
+                                                        infer_programme_type(programme))
         stale = _is_stale(programme, summary)
 
         self._debouncer.set_last_checked_time(programme_id)

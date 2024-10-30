@@ -1,6 +1,7 @@
 import abc
 
 from ohdieux.model.programme import Programme, ProgrammeSummary
+from ohdieux.ohdio.api_client import ProgrammeType
 
 
 class ProgrammeFetchingService(object):
@@ -15,7 +16,8 @@ class ProgrammeFetchingService(object):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def fetch_programme_summary(self, programme_id: int) -> ProgrammeSummary:
+    def fetch_programme_summary(self, programme_id: int,
+                                programme_type: ProgrammeType) -> ProgrammeSummary:
         """For staleness checking"""
         raise NotImplementedError
 

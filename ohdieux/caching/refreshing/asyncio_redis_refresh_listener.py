@@ -11,6 +11,7 @@ from ohdieux.caching.invalidation_strategy import InvalidationStrategy
 from ohdieux.caching.programme_cache import ProgrammeCache
 from ohdieux.caching.redis_adapter import RedisAdapter
 from ohdieux.ohdio.asyncio_programme_fetcher import AsyncioProgrammeFetcher
+from ohdieux.ohdio.programme_type import infer_programme_type
 
 
 @Component
@@ -70,7 +71,8 @@ class AsyncioRedisRefreshListener(object):
                 self._logger.info(f"Refreshing programme {programme_id} incrementally.")
                 result = await self._fetcher.fetch_programme_incremental_async(
                     programme_id, cached)
-                programme_summary = self._fetcher.fetch_programme_summary(programme_id)
+                programme_summary = self._fetcher.fetch_programme_summary(
+                    programme_id, infer_programme_type(result))
                 missing_episodes = programme_summary["episodes"] - len(result.episodes)
                 if missing_episodes / (programme_summary["episodes"] or 1) > 0.1:
                     self._logger.error(

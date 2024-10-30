@@ -1,21 +1,25 @@
 import asyncio
 import os
 from datetime import datetime
+from typing import cast
 
 from pydantic import TypeAdapter
 
 from ohdieux.ohdio.api_client import ApiClient
+from ohdieux.ohdio.programme_type import ProgrammeType
 from ohdieux.ohdio.types import (MediaStreamDescriptor, PlaybackList,
                                  ProgrammeWithoutCuesheet)
 
 
-async def main(programme_id: int):
+async def main(programme_id: int, programme_type: ProgrammeType):
     programme_validator = TypeAdapter(ProgrammeWithoutCuesheet)
     playback_list_validator = TypeAdapter(PlaybackList)
     media_validator = TypeAdapter(MediaStreamDescriptor)
 
     client = ApiClient(os.getenv("API_BASE_URL") or "", os.getenv("USER_AGENT") or "")
-    programme = await client.get_programme_by_id(programme_id, 1)
+    programme = await client.get_programme_by_id(programme_id, 1, programme_type)
+    import json
+    print(json.dumps(programme))
 
     programme_validator.validate_python(programme, strict=True)
 
@@ -35,8 +39,12 @@ async def main(programme_id: int):
                 int(playback_list_item['mediaPlaybackItem']['mediaId']), "progressive")
 
             media_validator.validate_python(media_stream)
+            break
+        break
 
 
 if __name__ == '__main__':
-    for programme_id in [4586, 3858, 672, 7135]:
-        asyncio.run(main(programme_id))
+    for programme_id, programme_type in [(9887, "balado"), (4586, "emissionpremiere"),
+                                         (3858, "emissionpremiere"),
+                                         (672, "emissionpremiere"), (7135, "balado")]:
+        asyncio.run(main(programme_id, cast(ProgrammeType, programme_type)))
