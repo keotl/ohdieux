@@ -35,10 +35,20 @@ async def main(programme_id: int, programme_type: ProgrammeType):
             broadcast_date = datetime.strptime(
                 playback_list_item['broadcastedFirstTimeAt'], "%Y-%m-%dT%H:%M:%S.%fZ")
             assert broadcast_date
-            media_stream = await client.get_media_stream(
-                int(playback_list_item['mediaPlaybackItem']['mediaId']), "progressive")
+            for platform in ("progressive", "hls"):
+                try:
+                    media_stream = await client.get_media_stream(
+                        int(playback_list_item['mediaPlaybackItem']['mediaId']),
+                        platform)
 
-            media_validator.validate_python(media_stream)
+                    media_validator.validate_python(media_stream)
+                    break
+                except:
+                    continue
+            else:
+                raise Exception(
+                    f"Could not find stream for {playback_list_item['mediaPlaybackItem']['mediaId']}"
+                )
             break
         break
 
@@ -46,5 +56,6 @@ async def main(programme_id: int, programme_type: ProgrammeType):
 if __name__ == '__main__':
     for programme_id, programme_type in [(9887, "balado"), (4586, "emissionpremiere"),
                                          (3858, "emissionpremiere"),
-                                         (672, "emissionpremiere"), (7135, "balado")]:
+                                         (672, "emissionpremiere"), (7135, "balado"),
+                                         (181, "grandesseries")]:
         asyncio.run(main(programme_id, cast(ProgrammeType, programme_type)))

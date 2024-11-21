@@ -38,7 +38,8 @@ class ApiClient(object):
                         "variables": json.dumps({
                             "params": {
                                 "context": "web",
-                                "forceWithoutCueSheet": programme_type == "balado",
+                                "forceWithoutCueSheet": programme_type
+                                in ("balado", "grandesseries"),
                                 "id": programme_id,
                                 "pageNumber": page_number
                             }
@@ -127,5 +128,6 @@ class FetchException(Exception):
 
 _PROGRAMME_BY_ID_QUERIES = {
     "balado": "01278be1ca37eec8570a3c6341c475c8b5799d571f407f3a9c1a3e2703cc5cc1",
-    "emissionpremiere": "a6d745162f4b6d9011e53382fcf981c09968d77909391b9c0e5302853f852444"
+    "emissionpremiere": "a6d745162f4b6d9011e53382fcf981c09968d77909391b9c0e5302853f852444",
+    "grandesseries": "6674354438ac2a4e609b3f16572a1ef58404fe1f13143e2607860bd1816714c6"
 }
