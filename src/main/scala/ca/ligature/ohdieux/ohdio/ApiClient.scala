@@ -105,5 +105,3 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
   }
 
 }
-
-object ApiClient {}

@@ -28,15 +28,10 @@ object Models {
 
   case class MediaDescriptor(media_url: String, media_type: String, length: Int)
 
-  enum EpisodeOrdering {
-    case OldestToNewest, NewestToOldest, Unknown
-  }
-
   case class Programme(
       programme_id: Int,
       episodes: List[EpisodeDescriptor],
       build_date: ZonedDateTime
-      // ordering: EpisodeOrdering
   )
 
   // JSON Serialization

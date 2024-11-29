@@ -10,9 +10,7 @@ private class EpisodeIterator(
     fetcher: (pageNumber: Int) => FetchResult[RCModels.ProgrammeById],
     direction: "normal" | "reverse"
 ) extends Iterator[RCModels.ProgrammeContentDetailItem] {
-  println(
-    s"Iterating over programme ${firstPage.content.contentDetail.items.head.title} direction=${direction}"
-  )
+
   private val totalItems =
     firstPage.content.contentDetail.pagedConfiguration.totalNumberOfItems
   private var currentPage =

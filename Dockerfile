@@ -4,7 +4,6 @@ RUN apk update
 RUN apk add curl bash
 RUN curl -fL "https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux-static.gz" | gzip -d > /usr/local/bin/cs
 RUN chmod +x /usr/local/bin/cs
-# RUN cs setup --dir /usr/local/sbin -y
 RUN cs install --dir /usr/local/bin scalac:3.5.1 sbt:1.10.2
 
 
