@@ -42,8 +42,6 @@ object Models {
     Json.reads[EpisodeDescriptor]
   implicit val mediaDescriptorReads: Reads[MediaDescriptor] =
     Json.reads[MediaDescriptor]
-  implicit val episodeOrderingReads: Reads[EpisodeOrdering] =
-    (JsPath).read[String].map(EpisodeOrdering.valueOf(_))
 
   implicit val programmeWrites: Writes[Programme] = Json.writes[Programme]
   implicit val programmeDescriptorWrites: Writes[ProgrammeDescriptor] =
@@ -52,9 +50,5 @@ object Models {
     Json.writes[EpisodeDescriptor]
   implicit val mediaDescriptorWrites: Writes[MediaDescriptor] =
     Json.writes[MediaDescriptor]
-  implicit val episodeOrderingWrites: Writes[EpisodeOrdering] =
-    new Writes[EpisodeOrdering] {
-      def writes(e: EpisodeOrdering) = JsString(e.toString())
-    }
 
 }

@@ -72,7 +72,7 @@ private case class ProgrammeScraperActorImpl(
       programmeId: Int
   ): Option[ProgrammeType] =
     println(s"guessing programme type for $programmeId")
-    ProgrammeType.values
+    LazyList(ProgrammeType.values*)
       .map(api.getProgrammeById(_, programmeId, 1))
       .find(_.isSuccess)
       .map(_.get)
