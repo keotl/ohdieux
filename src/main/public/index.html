@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ohdieux</title>
+  </head>
+
+  <body>
+    <h1><b>Oh</b>dieux</h1>
+    <a href="https://github.com/keotl/ohdieux">
+      À propos de ce site / About this website
+    </a>
+    <br />
+
+    <a href="/static/instructions.png"
+      ><img src="/static/instructions.png" style="width: 20rem"
+    /></a>
+    <p>
+      Saisissez le code d'émission numérique dans le champ texte ci-dessous.
+    </p>
+    <p>Enter the numeric programme ID in the input box.</p>
+
+    <p>
+      Copiez l'URL résultant dans votre lecteur de balados. La première
+      utilisation du lien peut nécéssiter plusieurs secondes ou minutes de
+      chargement. Ré-essayez l'URL après quelques minutes si une erreur se
+      produit.
+    </p>
+
+    <p>
+      Copy the returned URL into your podcasts application. Multiple seconds or
+      minutes may be necessary for the RSS feed to be generated for the first
+      time. Retry the URL after a few minutes.
+    </p>
+
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div>
+        <label for="programme_id">Code d'émission / Programme ID</label><br />
+        <input id="programme_id" />
+        <button id="submit">Soumettre / Submit</button>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <div>Options</div>
+        <div>
+          <input type="checkbox" id="reverse" /><label for="reverse"
+            >Inverser ordre segments / Reverse segment ordering
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" id="tag_segments" /><label for="tag_segments"
+            >Numéroter segments / Tag segment numbers
+          </label>
+        </div>
+        <div>
+        </div>
+        <div>
+          <input type="checkbox" id="limit_episodes" />
+          <label for="limit_episodes">
+            Limiter nombre d'épisodes / Limit episode count
+          </label>
+        </div>
+        <div>
+          <input type="checkbox" id="exclude_replays" />
+          <label for="exclude_replays">
+            Exclure rediffusions / Exclude replays
+          </label>
+        </div>
+      </div>
+    </div>
+    <br />
+    <a id="rss"> </a>
+    <div>
+      <div id="qrcode"></div>
+    </div>
+  </body>
+  <script src="/static/qrcode.js"></script>
+  <script>
+    document.getElementById("submit").onclick = (e) => {
+      let link =
+        "/rss?programme_id=" + document.getElementById("programme_id").value;
+      if (document.getElementById("reverse").checked) {
+        link = link + "&reverse=true";
+      }
+      if (document.getElementById("tag_segments").checked) {
+        link = link + "&tag_segments=true";
+      }
+      if (document.getElementById("limit_episodes").checked) {
+        link = link + "&limit_episodes=true";
+      }
+      if (document.getElementById("exclude_replays").checked) {
+        link = link + "&exclude_replays=true";
+      }
+      document.getElementById("rss").href = link;
+      document.getElementById("rss").innerHTML =
+        document.getElementById("rss").href;
+      document.getElementById("qrcode").innerHTML = "";
+      let qrcode = new QRCode(
+        document.getElementById("qrcode"),
+        new URL(link, location.href).href,
+      );
+    };
+  </script>
+</html>

@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+GET     /health                         ca.ligature.ohdieux.controllers.HealthController.index()
+GET     /rss                         ca.ligature.ohdieux.controllers.ManifestController.rss(programme_id: Int, reverse: Option[Boolean], tag_segments: Option[Boolean], limit_episodes: Option[Boolean], exclude_replays: Option[Boolean])
+GET     /admin                       ca.ligature.ohdieux.controllers.AdminController.index()
+POST    /admin/refresh               ca.ligature.ohdieux.controllers.AdminController.refresh(programme_id: Int, incremental: Option[Boolean])
+POST    /admin/rescan               ca.ligature.ohdieux.controllers.AdminController.rescanArchive(programme_id: Int)
+
+GET    /media/image/:programme_id    ca.ligature.ohdieux.controllers.MediaController.getImage(programme_id: Int)
+GET    /media/audio/:media_id        ca.ligature.ohdieux.controllers.MediaController.getMedia(media_id: Int)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /                    controllers.Assets.at(path="/public", file = "index.html")
+
