@@ -6,7 +6,7 @@ import ca.ligature.ohdieux.infrastructure.DatabaseExecutionContext
 import scala.concurrent.Future
 
 enum ProgrammeType {
-  case Balado, EmissionPremiere, GrandeSerie;
+  case Balado, EmissionPremiere, GrandeSerie, Audiobook;
 }
 case class ProgrammeEntity(
     id: Int,

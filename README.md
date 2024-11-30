@@ -31,7 +31,7 @@ be consumed in any third-party app, such as Apple Podcasts.
 ## Déploiement auto-géré (avancé) / Self-hosted deployment (advanced)
 Ohdieux a été réécrit pour simplifier le deploiement local. En mode
 local, Ohdieux offre une fonctionnalité d'archivage de média
-(désactivé par défaut). Voir [DÉPLOIEMENT.md](/docs/DÉPLOIEMENT.md)
+(désactivé par défaut). Voir [DÉPLOIEMENT.md](/docs/DEPLOIEMENT.md)
 pour débuter.
 
 Ohdieux has been rewritten to improve self-hosted deployments. When

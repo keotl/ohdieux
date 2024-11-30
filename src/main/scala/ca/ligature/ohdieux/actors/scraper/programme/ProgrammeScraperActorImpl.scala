@@ -41,7 +41,7 @@ private case class ProgrammeScraperActorImpl(
 
     firstPage match {
       case Success(page) =>
-        val programme = Assembler.assembleProgramme(page)
+        val programme = Assembler.assembleProgramme(programmeId, page)
         programmeRepository.save(programme)
         onNewProgrammeImage(
           programmeId,

@@ -47,7 +47,7 @@ private object Queries {
       programmeType: ProgrammeType,
       programmeId: Int,
       pageNumber: Int
-  ): Map[String, String] =
+  ): Option[(Map[String, String], JsValue => JsValue)] =
     programmeType match {
       case ProgrammeType.Balado => {
         val extensions = JsObject(
@@ -76,10 +76,13 @@ private object Queries {
           )
         )
 
-        return Map(
-          "opname" -> "programmeById",
-          "extensions" -> Json.stringify(extensions),
-          "variables" -> Json.stringify(variables)
+        return Some(
+          Map(
+            "opname" -> "programmeById",
+            "extensions" -> Json.stringify(extensions),
+            "variables" -> Json.stringify(variables)
+          ),
+          identity
         )
       }
 
@@ -110,10 +113,13 @@ private object Queries {
           )
         )
 
-        return Map(
-          "opname" -> "programmeById",
-          "extensions" -> Json.stringify(extensions),
-          "variables" -> Json.stringify(variables)
+        return Some(
+          Map(
+            "opname" -> "programmeById",
+            "extensions" -> Json.stringify(extensions),
+            "variables" -> Json.stringify(variables)
+          ),
+          identity
         )
       }
 
@@ -144,11 +150,98 @@ private object Queries {
           )
         )
 
-        return Map(
-          "opname" -> "programmeById",
-          "extensions" -> Json.stringify(extensions),
-          "variables" -> Json.stringify(variables)
+        return Some(
+          Map(
+            "opname" -> "programmeById",
+            "extensions" -> Json.stringify(extensions),
+            "variables" -> Json.stringify(variables)
+          ),
+          identity
+        )
+      }
+
+      case ProgrammeType.Audiobook => {
+        if (pageNumber > 1) {
+          return None
+        }
+        val extensions = JsObject(
+          Seq(
+            "persistedQuery" -> JsObject(
+              Seq(
+                "version" -> JsNumber(1),
+                "sha256Hash" -> JsString(
+                  "3d47cc0b96f17510696f3d4cc180a76cb2bdfb6a9a5dfefe958406687489c72f"
+                )
+              )
+            )
+          )
+        )
+
+        val variables = JsObject(
+          Seq(
+            "params" -> JsObject(
+              Seq(
+                "context" -> JsString("web"),
+                "id" -> JsNumber(programmeId)
+              )
+            )
+          )
+        )
+
+        return Some(
+          Map(
+            "opname" -> "audioBookById",
+            "extensions" -> Json.stringify(extensions),
+            "variables" -> Json.stringify(variables)
+          ),
+          audioBookTransform
         )
       }
     }
+}
+
+private def identity[T](x: T): T = x
+private def audioBookTransform(x: JsValue): JsValue = {
+  val programmeTitle = (x \ "data" \ "audioBookById" \ "header" \ "title")
+    .getOrElse(JsString("unknown"))
+  val patchedItems =
+    (x \ "data" \ "audioBookById" \ "content" \ "contentDetail" \ "items").get
+      .asInstanceOf[JsArray]
+      .value
+      .map(replaceTitle(programmeTitle.toString))
+
+  // audiobooks reuse the same episode id. This hack ensures that at
+  // least each segment has a relevant title. Otherwise, one random
+  // segment tile will be picked as the episode title.
+  Json.obj(
+    "data" ->
+      Json
+        .obj("programmeById" -> (x \ "data" \ "audioBookById").get)
+        .deepMerge(
+          Json.obj(
+            "programmeById" -> Json.obj(
+              "content" -> Json.obj(
+                "contentDetail" -> Json.obj(
+                  "items" -> patchedItems,
+                  "pagedConfiguration" ->
+                    Json.obj(
+                      "pageMaxLength" -> 1,
+                      "pageNumber" -> 1,
+                      "pageSize" -> 25,
+                      "totalNumberOfItems" -> patchedItems.length
+                    )
+                )
+              )
+            )
+          )
+        )
+  )
+}
+
+private def replaceTitle(title: String)(x: JsValue): JsValue = {
+  if (!x.isInstanceOf[JsObject]) {
+    x
+  } else {
+    x.as[JsObject] + ("title" -> JsString(title))
+  }
 }

@@ -67,7 +67,7 @@
   addProgrammeForm.addEventListener("submit", (e) => {
     e.preventDefault();
     fetch(
-      "/admin/refresh?programme_id=" +
+      "/admin/refresh?incremental=false&programme_id=" +
         document.getElementById("programme-id-input").value,
       { method: "POST" },
     )

@@ -6,10 +6,11 @@ import java.time.ZonedDateTime
 
 private object Assembler {
   def assembleProgramme(
+      programmeId: Int,
       programme: RCModels.ProgrammeById
   ): ProgrammeEntity =
     ProgrammeEntity(
-      id = programme.content.id,
+      id = programmeId,
       programme_type = guessProgrammeType(programme),
       title = programme.header.title,
       description = programme.header.summary,
@@ -47,6 +48,7 @@ private object Assembler {
       case "EmissionPremiere"      => ProgrammeType.EmissionPremiere
       case "EmissionBalado"        => ProgrammeType.Balado
       case "EmissionGrandesSeries" => ProgrammeType.GrandeSerie
+      case "AudioBook"             => ProgrammeType.Audiobook
     }
   }
 }

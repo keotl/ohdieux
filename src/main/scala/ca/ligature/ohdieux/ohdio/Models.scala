@@ -2,8 +2,9 @@ package ca.ligature.ohdieux.ohdio
 
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
+
 import scala.collection.immutable.LinearSeq
-import java.time.ZonedDateTime
+import java.time.{ZoneId, ZonedDateTime}
 
 object RCModels {
   case class ProgrammeById(
@@ -15,8 +16,7 @@ object RCModels {
 
   case class ProgrammeContent(
       typename: String,
-      contentDetail: ProgrammeContentDetail,
-      id: Int
+      contentDetail: ProgrammeContentDetail
   )
 
   case class ProgrammeHeader(
@@ -36,7 +36,8 @@ object RCModels {
 
   case class ProgrammeContentDetailItem(
       typename: String,
-      broadcastedFirstTimeAt: ZonedDateTime,
+      broadcastedFirstTimeAt: ZonedDateTime =
+        ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")),
       duration: Duration,
       isBroadcastedReplay: Boolean,
       playlistItemId: PlaylistItemId,
@@ -93,7 +94,8 @@ object RCModels {
       audioType: String,
       duration: Duration,
       mediaPlaybackItem: MediaPlaybackItem,
-      broadcastedFirstTimeAt: ZonedDateTime
+      broadcastedFirstTimeAt: ZonedDateTime =
+        ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
   )
   case class MediaPlaybackItem(
       mediaId: String,

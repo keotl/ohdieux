@@ -4,6 +4,7 @@ import scala.concurrent.Future
 import sttp.client4.quick.*
 import play.api.libs.json._
 import ca.ligature.ohdieux.persistence.ProgrammeType
+import ca.ligature.ohdieux.utils.|>
 
 case class ApiClient(val baseUrl: String, val userAgent: String) {
   import ApiClient._
@@ -23,9 +24,14 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
     if (pageNumber < 1) {
       return FetchFailure("Cannot lookup page below 1.")
     }
-    val queryParams =
+    val queryBuilder =
       Queries.buildGetProgrammeByIdQuery(programmeType, programmeId, pageNumber)
 
+    if (queryBuilder.isEmpty) {
+        return FetchFailure("No query to send")
+    }
+
+    val (queryParams, transform) = queryBuilder.get
     val response = quickRequest
       .get(uri"$baseUrl/bff/audio/graphql?$queryParams")
       .header("User-Agent", userAgent)
@@ -36,7 +42,7 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
       return FetchFailure(s"Request failed with ${response.code.code}")
     }
 
-    val body = Json.parse(response.body)
+    val body = Json.parse(response.body) |> transform
 
     val decoded =
       (body \ "data" \ "programmeById").validate[ProgrammeById]
