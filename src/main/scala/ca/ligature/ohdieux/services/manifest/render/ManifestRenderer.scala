@@ -109,7 +109,7 @@ case class ManifestRenderer(
         if (archive.exists(archive.createMediaHandle(episode.mediaId))) {
           episode.copy(
             mediaUrl =
-              s"${serverOptions.mediaArchiveBaseUrl}${episode.mediaId}",
+              s"${serverOptions.mediaArchiveBaseUrl}${episode.mediaId}.m4a",
             mediaType = "audio/mpeg"
           )
         } else {

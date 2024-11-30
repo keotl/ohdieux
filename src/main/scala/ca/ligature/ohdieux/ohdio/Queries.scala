@@ -208,7 +208,7 @@ private def audioBookTransform(x: JsValue): JsValue = {
     (x \ "data" \ "audioBookById" \ "content" \ "contentDetail" \ "items").get
       .asInstanceOf[JsArray]
       .value
-      .map(replaceTitle(programmeTitle.toString))
+      .map(replaceTitle(programmeTitle.as[JsString].value))
 
   // audiobooks reuse the same episode id. This hack ensures that at
   // least each segment has a relevant title. Otherwise, one random

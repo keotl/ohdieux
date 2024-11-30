@@ -47,4 +47,8 @@ class MediaController @Inject() (
       )
     }
   }
+  def getMediaFile(media_file: String) = {
+    val media_id = ".m4a$".r.replaceAllIn(media_file, "").toInt
+    getMedia(media_id)
+  }
 }
