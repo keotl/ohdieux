@@ -1,19 +1,24 @@
 package ca.ligature.ohdieux.controllers
 
 import javax.inject.Inject
-import play.api.mvc.ControllerComponents
-import play.api.mvc.BaseController
-import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
+import play.api.mvc.{
+  AnyContent,
+  BaseController,
+  ControllerComponents,
+  RangeResult,
+  Request,
+  ResponseHeader,
+  Result
+}
 import ca.ligature.ohdieux.actors.file.impl.ArchivedFileRepository
+
 import java.io.File
 import scala.concurrent.ExecutionContext
 import java.nio.file.Files
-import play.api.mvc.ResponseHeader
 import org.apache.pekko.stream.scaladsl.FileIO
 import org.apache.pekko.stream.scaladsl.Source
 import org.apache.pekko.util.ByteString
 import play.api.http.HttpEntity
-import play.api.mvc.Result
 
 class MediaController @Inject() (
     archive: ArchivedFileRepository,
@@ -34,18 +39,25 @@ class MediaController @Inject() (
   }
 
   def getMedia(media_id: Int) = Action {
-    val mediaHandle = archive.createMediaHandle(media_id)
-    if (!archive.exists(mediaHandle)) {
-      NotFound("not cached")
-    } else {
-      val path = archive.getPath(mediaHandle)
-      val source: Source[ByteString, ?] = FileIO.fromPath(path)
-      val contentLength = Some(Files.size(path))
-      Result(
-        header = ResponseHeader(200, Map.empty),
-        body = HttpEntity.Streamed(source, contentLength, Some("audio/mpeg"))
-      )
-    }
+    implicit request: Request[AnyContent] =>
+      {
+        val mediaHandle = archive.createMediaHandle(media_id)
+        if (!archive.exists(mediaHandle)) {
+          NotFound("not cached")
+        } else {
+          val path = archive.getPath(mediaHandle)
+          val source: Source[ByteString, ?] = FileIO.fromPath(path)
+          val contentLength = Some(Files.size(path))
+
+          RangeResult.ofSource(
+            entityLength = contentLength,
+            source = source,
+            rangeHeader = request.headers.get(RANGE),
+            fileName = Some(s"${media_id}.m4a"),
+            contentType = Some("audio/mpeg")
+          )
+        }
+      }
   }
   def getMediaFile(media_file: String) = {
     val media_id = ".m4a$".r.replaceAllIn(media_file, "").toInt
