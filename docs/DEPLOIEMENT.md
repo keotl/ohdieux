@@ -85,7 +85,7 @@ Les variables d'environnement sont définies dans [application.conf](/src/main/r
 | SCRAPER_AUTO_ADD_PROGRAMME  | Activer l'ajout automatique de chaque programme demandé sur la route `/rss` (true/false). | `true`                                    |
 | MANIFEST_SERVE_IMAGES       | Servir les fichiers images depuis l'archive locale. (true/false)                          | `false`                                   |
 | MANIFEST_SERVE_MEDIA        | Servir les fichiers audio depuis l'archive locale. (true/false)                           | `false`                                   |
-| MANIFEST_IMAGE_BASE_URL     | Configuration manuelle de l'URL de base pour les images à servir (déploiements avancés)   | `${PUBLIC_URL}/media/images/`             |
+| MANIFEST_IMAGE_BASE_URL     | Configuration manuelle de l'URL de base pour les images à servir (déploiements avancés)   | `${PUBLIC_URL}/media/image/`              |
 | MANIFEST_AUDIO_BASE_URL     | Configuration manuelle de l'URL de base pour les fichiers audio (déploiement avancés)     | `${PUBLIC_URL}/media/audio/`              |
 
 

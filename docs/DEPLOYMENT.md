@@ -84,7 +84,7 @@ Environment variables are defined and used in [application.conf](/src/main/resou
 | SCRAPER_AUTO_ADD_PROGRAMME  | Whether to automatically start tracking every queried programme (true/false).     | `true`                              |
 | MANIFEST_SERVE_IMAGES       | Whether to serve manifest images from local archive or upstream CDN. (true/false) | `false`                             |
 | MANIFEST_SERVE_MEDIA        | Whether to serve audio files from archive instead of upstream CDN. (true/false)   | `false`                             |
-| MANIFEST_IMAGE_BASE_URL     | Override image archive public URL. (Advanced deployments only.)                   | `${PUBLIC_URL}/media/images/`       |
+| MANIFEST_IMAGE_BASE_URL     | Override image archive public URL. (Advanced deployments only.)                   | `${PUBLIC_URL}/media/image/`        |
 | MANIFEST_AUDIO_BASE_URL     | Override audio archive public URL. (Advanced deployments only.)                   | `${PUBLIC_URL}/media/audio/`        |
 
 
