@@ -96,6 +96,7 @@ class Module(environment: Environment, configuration: Configuration)
         apiClient,
         programmeRepository,
         episodeRepository,
+        config.get("scraper.max_episodes"),
         mediaScraperRef,
         archiveRef,
         config.get("scraper.refresh_interval")

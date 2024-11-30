@@ -21,6 +21,7 @@ class ProgrammeScraperActor(
     apiClient: ApiClient,
     programmeRepository: ProgrammeRepository,
     episodeRepository: EpisodeRepository,
+    maxDepth: Int,
     context: ActorContext[ProgrammeScraperActor.Message],
     mediaScraper: ActorRef[MediaScraperActor.Message],
     archiveActor: ActorRef[FileArchiveActor.Message]
@@ -31,6 +32,7 @@ class ProgrammeScraperActor(
     apiClient,
     programmeRepository,
     episodeRepository,
+    maxDepth,
     onNewEpisodeFound,
     onNewProgrammeImage
   )
@@ -81,6 +83,7 @@ object ProgrammeScraperActor {
       apiClient: ApiClient,
       programmeRepository: ProgrammeRepository,
       episodeRepository: EpisodeRepository,
+      maxDepth: Int,
       mediaScraperRef: ActorRef[MediaScraperActor.Message],
       archiveActorRef: ActorRef[FileArchiveActor.Message],
       refreshInterval: Int
@@ -99,6 +102,7 @@ object ProgrammeScraperActor {
               apiClient,
               programmeRepository,
               episodeRepository,
+              maxDepth,
               context,
               mediaScraperRef,
               archiveActorRef

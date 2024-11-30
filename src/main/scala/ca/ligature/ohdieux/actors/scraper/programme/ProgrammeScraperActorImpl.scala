@@ -12,6 +12,7 @@ private case class ProgrammeScraperActorImpl(
     api: ApiClient,
     programmeRepository: ProgrammeRepository,
     episodeRepository: EpisodeRepository,
+    maxDepth: Int,
     onNewEpisode: (
         episode: RCModels.ProgrammeContentDetailItem,
         parentProgrammeId: Int
@@ -46,7 +47,12 @@ private case class ProgrammeScraperActorImpl(
           programmeId,
           programme.image_url
         )
-        saveEpisodes(programmeId, EpisodeIterator(page, fetcher), incremental)
+        saveEpisodes(
+          programmeId,
+          EpisodeIterator(page, fetcher),
+          incremental,
+          1
+        )
       case _ => ()
     }
   }
@@ -54,7 +60,8 @@ private case class ProgrammeScraperActorImpl(
   @tailrec private def saveEpisodes(
       programmeId: Int,
       iterator: EpisodeIterator,
-      incremental: Boolean
+      incremental: Boolean,
+      depth: Int
   ): Unit = {
     val episode = iterator.next()
     val savedEpisode =
@@ -63,8 +70,14 @@ private case class ProgrammeScraperActorImpl(
 
     onNewEpisode(episode, programmeId)
 
-    if (iterator.hasNext && (!incremental || savedEpisode.isEmpty)) {
-      saveEpisodes(programmeId, iterator, incremental)
+    val exceedsMaxDepth = maxDepth != 0 && depth >= maxDepth
+
+    if (
+      iterator.hasNext
+      && (!incremental || savedEpisode.isEmpty)
+      && !exceedsMaxDepth
+    ) {
+      saveEpisodes(programmeId, iterator, incremental, depth + 1)
     }
   }
 
