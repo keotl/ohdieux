@@ -25,7 +25,9 @@ episode_id INTEGER,
 episode_index INTEGER,
 length INTEGER,
 upstream_url TEXT,
-PRIMARY KEY("id"))""").execute()
+PRIMARY KEY("id")
+UNIQUE (episode_id,episode_index)
+)""").execute()
   })
 
   private val parser: RowParser[MediaEntity] =

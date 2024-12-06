@@ -1,10 +1,11 @@
 import argparse
+from datetime import timedelta, tzinfo
 import itertools
 import json
 import os.path
 import sys
 from typing import Iterable, List
-
+import dateutil.parser
 
 def _programme_type(canonical_url: str) -> str:
     if "premiere/emission" in canonical_url:
@@ -14,24 +15,27 @@ def _programme_type(canonical_url: str) -> str:
     if "grandes-series" in canonical_url:
         return "GrandeSerie"
 
-    return "Unknown"
+    raise Exception("Unsupported programme type")
 
 
 def _format_str(text: str) -> str:
     return f"""'{text.replace("'", "''")}'"""
 
+def _format_date(text: str) -> str:
+    parsed = dateutil.parser.parse(text, ignoretz=True) + timedelta(microseconds=1)
+    return f"""'{parsed.isoformat()}Z'"""
 
 def insert_programme_statement(programme_id: int, programme: dict) -> str:
     return f"""INSERT INTO programmes(id, programme_type, title, description, author, canonical_url, image_url, episodes, last_checked)
     VALUES ({programme_id},
-    {_programme_type(programme["programme"]["link"])},
+    {_format_str(_programme_type(programme["programme"]["link"]))},
     {_format_str(programme["programme"]["title"])},
     {_format_str(programme["programme"]["description"])},
     {_format_str(programme["programme"]["author"])},
     {_format_str(programme["programme"]["link"])},
     {_format_str(programme["programme"]["image_url"])},
     {len(programme["episodes"])},
-    {_format_str(programme["build_date"].replace(" ", "T") + "Z")});
+    {_format_date(programme["build_date"])});
     """
 
 
@@ -41,7 +45,7 @@ def insert_episode_statement(programme_id: int, episode: dict) -> str:
     {_format_str(episode["title"])},
     {_format_str(episode["description"])},
     {programme_id},
-    {_format_str(episode["date"].replace(" ", "T") + "Z")},
+    {_format_date(episode["date"])},
     {episode["duration"]},
     {int(episode.get("is_broadcast_replay", False) or False)});
     """
@@ -67,15 +71,18 @@ def main(output_file: str, filenames: List[str], programme_id_arg: str,
         programme_id = int((os.path.basename(file)).replace(
             ".json",
             "")) if programme_id_arg == "INFER" else int(programme_id_arg)
-        output_statements.append(
-            insert_programme_statement(programme_id, programme))
-        output_statements.extend(
-            map(lambda e: insert_episode_statement(programme_id, e),
-                programme["episodes"]))
-        if force_preserve_media:
+        try:
+            output_statements.append(
+                insert_programme_statement(programme_id, programme))
             output_statements.extend(
-                itertools.chain(
-                    *map(insert_media_statements, programme["episodes"])))
+                map(lambda e: insert_episode_statement(programme_id, e),
+                    programme["episodes"]))
+            if force_preserve_media:
+                output_statements.extend(
+                    itertools.chain(
+                        *map(insert_media_statements, programme["episodes"])))
+        except:
+            continue
 
     with open(output_file, "w") as f:
         f.write("\n".join(output_statements))
@@ -103,8 +110,6 @@ parser.add_argument(
     dest="force_preserve_media",
     help="""Create fake media entries to retain saved media_urls.
     V1 did not store media IDs, so we have to invent a media ID based on the episode ID.
-    This WILL cause duplicate episodes to appear for current programmes.
-    This option is offered to preserve programmes that have been removed from the upstream API.
     Invented media IDs will be *negative*, so removing them can be done afterwards by filtering on the media table where id < 0."""
 )
 
