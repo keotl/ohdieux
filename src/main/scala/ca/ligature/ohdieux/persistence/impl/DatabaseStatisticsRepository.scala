@@ -22,7 +22,7 @@ archive_stats.archived_episodes as archived_episodes,
 COUNT() as known_episodes
 FROM programmes
   INNER JOIN episodes ON programmes.id = episodes.programme_id
-  INNER JOIN archive_stats ON programmes.id = archive_stats.programme_id
+  FULL JOIN archive_stats ON programmes.id = archive_stats.programme_id
   GROUP BY programmes.id
   ORDER BY programmes.id ASC;""")
 
@@ -30,7 +30,7 @@ FROM programmes
       programme_id: Int,
       title: String,
       advertised_episodes: Int,
-      archived_episodes: Int,
+      archived_episodes: Option[Int],
       known_episodes: Int
   )
   private val queryResultParser: RowParser[QueryResult] =
@@ -47,7 +47,7 @@ FROM programmes
             title = r.title,
             advertisedEpisodes = r.advertised_episodes,
             knownEpisodes = r.known_episodes,
-            archivedEpisodes = r.archived_episodes
+            archivedEpisodes = r.archived_episodes.getOrElse(0)
           )
         )
       }
