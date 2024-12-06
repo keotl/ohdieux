@@ -15,7 +15,13 @@ case class FileArchiveActorImpl(
     }
   }
 
-  def saveMedia(mediaId: Int, mediaUrl: String, skipDownload: Boolean): Unit = {
+  def saveMedia(
+      mediaId: Int,
+      mediaUrl: String,
+      skipDownload: Boolean,
+      parentProgrammeId: Int,
+      onNewFileSaved: (programmeId: Int) => Unit
+  ): Unit = {
     val savedMedia = archive.createMediaHandle(mediaId)
     if (!archive.exists(savedMedia) && archiveMedia && !skipDownload) {
       val tempFile = archive.getTemporaryFileHandle(".mp4")
@@ -32,6 +38,7 @@ case class FileArchiveActorImpl(
         tempFile
       )
       archive.moveToArchive(tempFile, savedMedia)
+      onNewFileSaved(parentProgrammeId)
     }
   }
 

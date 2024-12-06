@@ -17,7 +17,12 @@ private case class MediaScraperActorImpl(
         mediaId: Int,
         currentUrl: Option[String]
     ) => Boolean,
-    onNewMedia: (mediaId: Int, mediaUrl: String, skipDownload: Boolean) => Unit
+    onNewMedia: (
+        mediaId: Int,
+        mediaUrl: String,
+        skipDownload: Boolean,
+        programmeId: Int
+    ) => Unit
 ) {
 
   def fetchEpisodeMedia(
@@ -36,7 +41,8 @@ private case class MediaScraperActorImpl(
         onNewMedia(
           mediaId.toInt,
           mediaUrl,
-          archiveBlacklist.contains(parentProgrammeId)
+          archiveBlacklist.contains(parentProgrammeId),
+          parentProgrammeId
         )
         mediaRepository.save(
           MediaEntity(
@@ -55,7 +61,12 @@ private case class MediaScraperActorImpl(
     for (episode <- episodeRepository.getByProgrammeId(programmeId)) do {
       val media = mediaRepository.getByEpisodeId(episode.id)
       for (m <- media) do {
-        onNewMedia(m.id, m.upstream_url, archiveBlacklist.contains(programmeId))
+        onNewMedia(
+          m.id,
+          m.upstream_url,
+          archiveBlacklist.contains(programmeId),
+          programmeId
+        )
       }
     }
   }

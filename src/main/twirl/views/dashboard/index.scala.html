@@ -9,7 +9,13 @@
     <input id="programme-id-input" placeholder="programmeId" />
     <button type="submit" id="add-programme-button">Add</button>
   </form>
-</div>
+  </div>
+  <button
+    hx-post="/admin/recompute-stats"
+    title="Recompute all archive statistics (Slow)"
+    >
+    Recompute all archive statistics (Slow)
+  </button>
 <table>
   <thead>
     <th></th>

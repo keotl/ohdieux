@@ -18,6 +18,7 @@ import ca.ligature.ohdieux.services.manifest.ManifestService
 import ca.ligature.ohdieux.services.manifest.types.ManifestRenderServerOptions
 import ca.ligature.ohdieux.infrastructure.DefaultErrorHandler
 import scala.collection.immutable.HashSet
+import ca.ligature.ohdieux.actors.stats.ArchiveStatisticsActor
 
 class Module(environment: Environment, configuration: Configuration)
     extends AbstractModule
@@ -31,6 +32,9 @@ class Module(environment: Environment, configuration: Configuration)
     bind(classOf[ManifestService])
     bind(classOf[ManifestRepository]).to(
       classOf[DatabaseProgrammeManifestRepository]
+    )
+    bind(classOf[StatisticsRepository]).to(
+      classOf[DatabaseStatisticsRepository]
     )
     bind(classOf[ArchivedFileRepository]).toInstance(
       new ArchivedFileRepository(
@@ -107,16 +111,34 @@ class Module(environment: Environment, configuration: Configuration)
 
   @Provides @Singleton
   def provideFileArchiveActor(
+      statsActor: ActorRef[ArchiveStatisticsActor.Message],
       archive: ArchivedFileRepository,
       config: Configuration
   ): ActorRef[FileArchiveActor.Message] = {
     return ActorSystem[FileArchiveActor.Message](
       FileArchiveActor(
+        statsActor,
         archive,
         config.get("rc.user_agent"),
         config.get("archive.archive_media")
       ),
       "file-archive"
+    )
+  }
+
+  @Provides @Singleton
+  def provideArchiveStatisticsActor(
+      manifestRepository: ManifestRepository,
+      statsRepository: StatisticsRepository,
+      archive: ArchivedFileRepository
+  ): ActorRef[ArchiveStatisticsActor.Message] = {
+    return ActorSystem[ArchiveStatisticsActor.Message](
+      ArchiveStatisticsActor(
+        manifestRepository,
+        statsRepository,
+        archive
+      ),
+      "archive-stats"
     )
   }
 }

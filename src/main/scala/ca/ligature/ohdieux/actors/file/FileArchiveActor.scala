@@ -8,9 +8,11 @@ import ca.ligature.ohdieux.actors.file.impl.FileArchiveActorImpl
 import org.apache.pekko.actor.typed.SupervisorStrategy
 import ca.ligature.ohdieux.actors.file.impl.ArchivedFileRepository
 import org.apache.pekko.actor.typed.ActorRef
+import ca.ligature.ohdieux.actors.stats.ArchiveStatisticsActor
 
 class FileArchiveActor(
     impl: FileArchiveActorImpl,
+    statsActor: ActorRef[ArchiveStatisticsActor.Message],
     context: ActorContext[FileArchiveActor.Message]
 ) extends AbstractBehavior[FileArchiveActor.Message](context) {
   import FileArchiveActor._
@@ -19,20 +21,45 @@ class FileArchiveActor(
     msg match {
       case Message.SaveImage(programmeId, imageUrl) =>
         impl.saveImage(programmeId, imageUrl)
-      case Message.SaveMedia(mediaId, upstreamUrl, skipDownload) =>
-        impl.saveMedia(mediaId, upstreamUrl, skipDownload)
+      case Message.SaveMedia(
+            mediaId,
+            upstreamUrl,
+            skipDownload,
+            parentProgrammeId
+          ) =>
+        impl.saveMedia(
+          mediaId,
+          upstreamUrl,
+          skipDownload,
+          parentProgrammeId,
+          onNewFileSaved
+        )
     }
     this
+  }
+
+  private def onNewFileSaved(programmeId: Int): Unit = {
+    statsActor.tell(
+      ArchiveStatisticsActor.Message.IncrementArchivedCountForProgramme(
+        programmeId
+      )
+    )
   }
 }
 
 object FileArchiveActor {
   enum Message {
     case SaveImage(programmeId: Int, imageUrl: String)
-    case SaveMedia(mediaId: Int, upstreamUrl: String, skipDownload: Boolean)
+    case SaveMedia(
+        mediaId: Int,
+        upstreamUrl: String,
+        skipDownload: Boolean,
+        parentProgrammeId: Int
+    )
   }
 
   def apply(
+      statsActor: ActorRef[ArchiveStatisticsActor.Message],
       archive: ArchivedFileRepository,
       userAgent: String,
       archiveMedia: Boolean
@@ -42,6 +69,7 @@ object FileArchiveActor {
         Behaviors.setup(context =>
           new FileArchiveActor(
             new FileArchiveActorImpl(archive, userAgent, archiveMedia),
+            statsActor,
             context
           )
         )

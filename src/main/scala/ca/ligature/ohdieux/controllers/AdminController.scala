@@ -10,10 +10,12 @@ import ca.ligature.ohdieux.actors.scraper.media.MediaScraperActor
 import play.api.mvc.ControllerComponents
 import ca.ligature.ohdieux.persistence.ProgrammeRepository
 import ca.ligature.ohdieux.services.StatisticsService
+import ca.ligature.ohdieux.actors.stats.ArchiveStatisticsActor
 
 class AdminController @Inject() (
     val scraper: ActorRef[ProgrammeScraperActor.Message],
     val mediaScraper: ActorRef[MediaScraperActor.Message],
+    val archiveStatsActor: ActorRef[ArchiveStatisticsActor.Message],
     val statisticsService: StatisticsService,
     val controllerComponents: ControllerComponents
 ) extends BaseController {
@@ -45,6 +47,16 @@ class AdminController @Inject() (
         mediaScraper.tell(
           MediaScraperActor.Message
             .RetriggerDownloads(programme_id)
+        )
+        Ok("ok")
+      }
+  }
+
+  def recomputeArchiveStatistics() = Action {
+    implicit request: Request[AnyContent] =>
+      {
+        archiveStatsActor.tell(
+          ArchiveStatisticsActor.Message.RecomputeArchiveStatistics()
         )
         Ok("ok")
       }

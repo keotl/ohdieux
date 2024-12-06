@@ -7,6 +7,7 @@ GET     /rss                         ca.ligature.ohdieux.controllers.ManifestCon
 GET     /admin                       ca.ligature.ohdieux.controllers.AdminController.index()
 POST    /admin/refresh               ca.ligature.ohdieux.controllers.AdminController.refresh(programme_id: Int, incremental: Option[Boolean])
 POST    /admin/rescan               ca.ligature.ohdieux.controllers.AdminController.rescanArchive(programme_id: Int)
+POST    /admin/recompute-stats      ca.ligature.ohdieux.controllers.AdminController.recomputeArchiveStatistics()
 
 GET    /media/image/:programme_id    ca.ligature.ohdieux.controllers.MediaController.getImage(programme_id: Int)
 GET    /media/audio/:media_file      ca.ligature.ohdieux.controllers.MediaController.getMediaFile(media_file: String)

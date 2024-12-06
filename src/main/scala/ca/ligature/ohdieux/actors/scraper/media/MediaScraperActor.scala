@@ -63,12 +63,14 @@ class MediaScraperActor(
   private def onNewMedia(
       mediaId: Int,
       mediaUrl: String,
-      skipDownload: Boolean
+      skipDownload: Boolean,
+      programmeId: Int
   ): Unit = {
     fileArchiver ! FileArchiveActor.Message.SaveMedia(
       mediaId,
       mediaUrl,
-      skipDownload
+      skipDownload,
+      programmeId
     )
   }
 
