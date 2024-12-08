@@ -56,7 +56,7 @@ private object Queries {
               Seq(
                 "version" -> JsNumber(1),
                 "sha256Hash" -> JsString(
-                  "01278be1ca37eec8570a3c6341c475c8b5799d571f407f3a9c1a3e2703cc5cc1"
+                  "3cf8cb9c41eea3f2a8e0e34a32dd38be14dc653620df59d19b0ddc0dbf5bd0df"
                 )
               )
             )
@@ -93,7 +93,7 @@ private object Queries {
               Seq(
                 "version" -> JsNumber(1),
                 "sha256Hash" -> JsString(
-                  "a6d745162f4b6d9011e53382fcf981c09968d77909391b9c0e5302853f852444"
+                  "43140230d24ccd46d04ac08d9a413d7f94b4bfc0f3145ee926b12de377f64335"
                 )
               )
             )
@@ -130,7 +130,7 @@ private object Queries {
               Seq(
                 "version" -> JsNumber(1),
                 "sha256Hash" -> JsString(
-                  "6674354438ac2a4e609b3f16572a1ef58404fe1f13143e2607860bd1816714c6"
+                  "998ab7dcd371db7319c9fe18e027ef971f267e9584c9117afaeeb24e06aae7b6"
                 )
               )
             )
@@ -170,7 +170,7 @@ private object Queries {
               Seq(
                 "version" -> JsNumber(1),
                 "sha256Hash" -> JsString(
-                  "3d47cc0b96f17510696f3d4cc180a76cb2bdfb6a9a5dfefe958406687489c72f"
+                  "fffa8c9d5062d18637e341f329d6e4d91709ab7cdd3ef87646ef80fa1e05dd29"
                 )
               )
             )
