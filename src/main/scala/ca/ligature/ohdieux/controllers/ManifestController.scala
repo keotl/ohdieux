@@ -44,6 +44,6 @@ class ManifestController @Inject() (
             "Cache-Control" -> "max-age=1800, stale-if-error=86400"
           )
       )
-      .getOrElse(Ok("not found"))
+      .getOrElse(NotFound("not found"))
   }
 }
