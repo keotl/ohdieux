@@ -123,7 +123,6 @@ case class ManifestRenderer(
       // blindly replace .mp4 urls with .aac, assuming it exists.
       // This is deprecated, as it does not work reliably for all programmes.
       if (""".*/mp4/.*\.mp4$""".r.matches(episode.mediaUrl)) {
-        println(episode.mediaUrl)
         episode.copy(mediaUrl =
           episode.mediaUrl.replace("/mp4/", "/hls/").replace(".mp4", ".aac")
         )
