@@ -22,7 +22,8 @@ class ManifestController @Inject() (
       reverse: Option[Boolean],
       tag_segments: Option[Boolean],
       limit_episodes: Option[Boolean],
-      exclude_replays: Option[Boolean]
+      exclude_replays: Option[Boolean],
+      favor_aac: Option[Boolean]
   ) = Action { implicit request: Request[AnyContent] =>
     val programme = manifestService.renderManifest(
       programme_id,
@@ -30,7 +31,8 @@ class ManifestController @Inject() (
         reverse = reverse.getOrElse(false),
         tag_segments = tag_segments.getOrElse(false),
         limit_episodes = limit_episodes.getOrElse(false),
-        exclude_replays = exclude_replays.getOrElse(false)
+        exclude_replays = exclude_replays.getOrElse(false),
+        favor_aac = favor_aac.getOrElse(false)
       )
     )
 

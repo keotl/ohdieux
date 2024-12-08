@@ -4,7 +4,10 @@ case class ManifestRenderUserOptions(
     reverse: Boolean,
     tag_segments: Boolean,
     limit_episodes: Boolean,
-    exclude_replays: Boolean
+    exclude_replays: Boolean,
+
+    // Deprecated
+    favor_aac: Boolean
 )
 
 case class ManifestRenderServerOptions(
