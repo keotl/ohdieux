@@ -205,7 +205,8 @@ private def audioBookTransform(x: JsValue): JsValue = {
   val programmeTitle = (x \ "data" \ "audioBookById" \ "header" \ "title")
     .getOrElse(JsString("unknown"))
   val patchedItems =
-    (x \ "data" \ "audioBookById" \ "content" \ "contentDetail" \ "items").get
+    (x \ "data" \ "audioBookById" \ "content" \ "contentDetail" \ "items")
+      .getOrElse(Json.arr())
       .asInstanceOf[JsArray]
       .value
       .map(replaceTitle(programmeTitle.as[JsString].value))
@@ -216,7 +217,10 @@ private def audioBookTransform(x: JsValue): JsValue = {
   Json.obj(
     "data" ->
       Json
-        .obj("programmeById" -> (x \ "data" \ "audioBookById").get)
+        .obj(
+          "programmeById" -> (x \ "data" \ "audioBookById")
+            .getOrElse(Json.obj())
+        )
         .deepMerge(
           Json.obj(
             "programmeById" -> Json.obj(

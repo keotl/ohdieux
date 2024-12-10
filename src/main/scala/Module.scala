@@ -36,6 +36,9 @@ class Module(environment: Environment, configuration: Configuration)
     bind(classOf[StatisticsRepository]).to(
       classOf[DatabaseStatisticsRepository]
     )
+    bind(classOf[ProgrammeConfigRepository]).to(
+      classOf[DatabaseProgrammeConfigRepository]
+    )
     bind(classOf[ArchivedFileRepository]).toInstance(
       new ArchivedFileRepository(
         configuration.get("archive.base_dir"),
@@ -91,6 +94,7 @@ class Module(environment: Environment, configuration: Configuration)
       apiClient: ApiClient,
       programmeRepository: ProgrammeRepository,
       episodeRepository: EpisodeRepository,
+      programmeConfigRepository: ProgrammeConfigRepository,
       mediaScraperRef: ActorRef[MediaScraperActor.Message],
       archiveRef: ActorRef[FileArchiveActor.Message],
       config: Configuration
@@ -100,6 +104,7 @@ class Module(environment: Environment, configuration: Configuration)
         apiClient,
         programmeRepository,
         episodeRepository,
+        programmeConfigRepository,
         config.get("scraper.max_episodes"),
         mediaScraperRef,
         archiveRef,

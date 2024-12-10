@@ -16,11 +16,17 @@ import com.google.inject.Provides
 import com.google.inject.Inject
 import ca.ligature.ohdieux.actors.file.FileArchiveActor
 import scala.concurrent.duration.DurationInt
+import ca.ligature.ohdieux.persistence.ProgrammeConfigRepository
+import ca.ligature.ohdieux.persistence.ProgrammeConfigStatus
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import ca.ligature.ohdieux.persistence.ProgrammeConfigEntity
 
 class ProgrammeScraperActor(
     apiClient: ApiClient,
     programmeRepository: ProgrammeRepository,
     episodeRepository: EpisodeRepository,
+    programmeConfigRepository: ProgrammeConfigRepository,
     maxDepth: Int,
     context: ActorContext[ProgrammeScraperActor.Message],
     mediaScraper: ActorRef[MediaScraperActor.Message],
@@ -39,8 +45,15 @@ class ProgrammeScraperActor(
 
   override def onMessage(msg: Message): Behavior[Message] = {
     msg match {
-      case Message.FetchProgramme(programmeId, incremental) =>
-        impl.fetchProgramme(programmeId, incremental)
+      case Message.FetchProgramme(programmeId, incremental) => {
+        if (shouldFetchProgramme(programmeId)) {
+          try {
+            impl.fetchProgramme(programmeId, incremental)
+          } catch {
+            case e => trackFetchFailure(programmeId, e.getMessage())
+          }
+        }
+      }
       case Message.RefreshAllProgrammesIncrementally() => {
         val programmes = programmeRepository.getAll()
         context.log.info(
@@ -71,6 +84,26 @@ class ProgrammeScraperActor(
   private def onNewProgrammeImage(programmeId: Int, imageUrl: String): Unit = {
     archiveActor ! FileArchiveActor.Message.SaveImage(programmeId, imageUrl)
   }
+
+  private def shouldFetchProgramme(
+      programmeId: Int
+  ): Boolean = {
+    val config = programmeConfigRepository.getProgrammeConfig(programmeId)
+    val notFailed = config.status != ProgrammeConfigStatus.Failed
+
+    notFailed
+  }
+
+  private def trackFetchFailure(programmeId: Int, message: String): Unit = {
+    programmeConfigRepository.saveProgrammeConfig(
+      ProgrammeConfigEntity(
+        programmeId,
+        ProgrammeConfigStatus.Failed,
+        message,
+        ZonedDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+      )
+    )
+  }
 }
 
 object ProgrammeScraperActor {
@@ -83,6 +116,7 @@ object ProgrammeScraperActor {
       apiClient: ApiClient,
       programmeRepository: ProgrammeRepository,
       episodeRepository: EpisodeRepository,
+      programmeConfigRepository: ProgrammeConfigRepository,
       maxDepth: Int,
       mediaScraperRef: ActorRef[MediaScraperActor.Message],
       archiveActorRef: ActorRef[FileArchiveActor.Message],
@@ -102,6 +136,7 @@ object ProgrammeScraperActor {
               apiClient,
               programmeRepository,
               episodeRepository,
+              programmeConfigRepository,
               maxDepth,
               context,
               mediaScraperRef,

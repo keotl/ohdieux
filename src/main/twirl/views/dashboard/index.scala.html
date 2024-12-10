@@ -67,6 +67,22 @@
   </tbody>
 </table>
 
+<h2>Failures</h2>
+<table>
+  <thead>
+    <th>Programme ID</th>
+    <th>Message</th>
+    <th>Date</th>
+  </thead>
+  <tbody>
+    @for(failure <- stats.failures) {
+      <td>@failure.programme_id</td>
+    <td>@failure.message</td>
+    <td>@failure.date</td>
+    }
+  </tbody>
+</table>
+
 <script>
   const addProgrammeForm = document.getElementById("add-programme-form");
   const addProgrammeButton = document.getElementById("add-programme-button");
