@@ -76,9 +76,11 @@
   </thead>
   <tbody>
     @for(failure <- stats.failures) {
+    <tr>
       <td>@failure.programme_id</td>
-    <td>@failure.message</td>
-    <td>@failure.date</td>
+      <td>@failure.message</td>
+      <td>@failure.date</td>
+    </tr>
     }
   </tbody>
 </table>
