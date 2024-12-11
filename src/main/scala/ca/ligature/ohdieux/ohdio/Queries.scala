@@ -202,14 +202,13 @@ private object Queries {
 
 private def identity[T](x: T): T = x
 private def audioBookTransform(x: JsValue): JsValue = {
-  val programmeTitle = (x \ "data" \ "audioBookById" \ "header" \ "title")
-    .getOrElse(JsString("unknown"))
   val patchedItems =
     (x \ "data" \ "audioBookById" \ "content" \ "contentDetail" \ "items")
       .getOrElse(Json.arr())
       .asInstanceOf[JsArray]
       .value
-      .map(replaceTitle(programmeTitle.as[JsString].value))
+      .zipWithIndex
+      .map(replaceAudiobookPlaylistItemId)
 
   // audiobooks reuse the same episode id. This hack ensures that at
   // least each segment has a relevant title. Otherwise, one random
@@ -242,10 +241,20 @@ private def audioBookTransform(x: JsValue): JsValue = {
   )
 }
 
-private def replaceTitle(title: String)(x: JsValue): JsValue = {
+private def replaceAudiobookPlaylistItemId(x: JsValue, index: Int): JsValue = {
   if (!x.isInstanceOf[JsObject]) {
     x
   } else {
-    x.as[JsObject] + ("title" -> JsString(title))
+    val playlistItemId =
+      (x \ "playlistItemId" \ "globalId2" \ "id").getOrElse(JsString("unknown"))
+    val inventedEpisodeId =
+      -playlistItemId.as[JsString].value.toInt * 1000 - index
+    x.asInstanceOf[JsObject]
+      .deepMerge(
+        Json.obj(
+          "playlistItemId" -> Json
+            .obj("globalId2" -> Json.obj("id" -> inventedEpisodeId.toString))
+        )
+      )
   }
 }

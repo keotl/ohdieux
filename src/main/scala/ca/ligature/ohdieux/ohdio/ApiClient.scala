@@ -55,7 +55,9 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
       playbackListId: String
   ): FetchResult[PlaybackListById] = {
     println(s"getPlaybackListById(${contentTypeId}, ${playbackListId})")
-
+    if (playbackListId.toInt < 0) {
+      return FetchFailure(s"Refusing getPlaybackListById with negative id.")
+    }
     val query =
       Queries.buildGetPlaybackListByGlobalIdQuery(contentTypeId, playbackListId)
 
