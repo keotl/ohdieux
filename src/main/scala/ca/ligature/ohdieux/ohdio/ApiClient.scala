@@ -5,13 +5,16 @@ import sttp.client4.quick.*
 import play.api.libs.json._
 import ca.ligature.ohdieux.persistence.ProgrammeType
 import ca.ligature.ohdieux.utils.|>
+import play.api.Logger
 
 case class ApiClient(val baseUrl: String, val userAgent: String) {
   import ApiClient._
   import RCModels._
   import RCModels.FetchResult._
 
-  println(
+  val logger = Logger(this.getClass.getName)
+
+  logger.info(
     s"Initialized ApiClient to ${baseUrl} with User-Agent \"${userAgent}\""
   )
 
@@ -20,7 +23,9 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
       programmeId: Int,
       pageNumber: Int
   ): FetchResult[ProgrammeById] = {
-    println(s"getProgrammeById(${programmeType}/${programmeId},${pageNumber})")
+    logger.info(
+      s"getProgrammeById(${programmeType}/${programmeId},${pageNumber})"
+    )
     if (pageNumber < 1) {
       return FetchFailure("Cannot lookup page below 1.")
     }
@@ -28,7 +33,7 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
       Queries.buildGetProgrammeByIdQuery(programmeType, programmeId, pageNumber)
 
     if (queryBuilder.isEmpty) {
-        return FetchFailure("No query to send")
+      return FetchFailure("No query to send")
     }
 
     val (queryParams, transform) = queryBuilder.get
@@ -54,7 +59,7 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
       contentTypeId: Int,
       playbackListId: String
   ): FetchResult[PlaybackListById] = {
-    println(s"getPlaybackListById(${contentTypeId}, ${playbackListId})")
+    logger.info(s"getPlaybackListById(${contentTypeId}, ${playbackListId})")
     if (playbackListId.toInt < 0) {
       return FetchFailure(s"Refusing getPlaybackListById with negative id.")
     }
@@ -83,7 +88,7 @@ case class ApiClient(val baseUrl: String, val userAgent: String) {
       mediaId: Int,
       tech: "hls" | "progressive"
   ): FetchResult[MediaStream] = {
-    println(s"getMedia(${mediaId}, ${tech})")
+    logger.info(s"getMedia(${mediaId}, ${tech})")
     val query = Map(
       "appCode" -> "medianet",
       "connectionType" -> "hd",
