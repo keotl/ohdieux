@@ -1,0 +1,104 @@
+@import ca.ligature.ohdieux.services.GlobalStatistics
+@(stats: GlobalStatistics)
+<script src="https://unpkg.com/htmx.org@@2.0.3"></script>
+
+<h1>Admin dashboard</h1>
+
+  <div style="display: flex; flex-direction: row;">
+  <form id="add-programme-form">
+    <input id="programme-id-input" placeholder="programmeId" />
+    <button type="submit" id="add-programme-button">Add</button>
+  </form>
+  </div>
+  <button
+    hx-post="/admin/recompute-stats"
+    title="Recompute all archive statistics (Slow)"
+    >
+    Recompute all archive statistics (Slow)
+  </button>
+<table>
+  <thead>
+    <th></th>
+    <th>ProgrammeId</th>
+    <th>Title</th>
+    <th>Advertised episodes</th>
+    <th>Known episodes</th>
+    <th>Archived episodes</th>
+    <th></th>
+  </thead>
+  <tbody>
+    @for(programme <- stats.programmes) {
+    <tr>
+      <td>
+        <img
+          src="/media/image/@programme.programmeId"
+          style="width: 32px; height: 32px"
+        />
+      </td>
+      <td>@programme.programmeId</td>
+      <td>@programme.title</td>
+      <td>@programme.advertisedEpisodes</td>
+      <td>@programme.knownEpisodes</td>
+      <td>@programme.archivedEpisodes</td>
+      <td>
+        <a target="_blank" href="/rss?programme_id=@programme.programmeId"
+          >RSS</a
+        >
+        <button
+          hx-post="/admin/refresh?programme_id=@programme.programmeId&incremental=true"
+        >
+          Incremental Refresh
+        </button>
+
+        <button
+          hx-post="/admin/refresh?programme_id=@programme.programmeId&incremental=false"
+        >
+          Full Refresh
+        </button>
+        <button
+          hx-post="/admin/rescan?programme_id=@programme.programmeId"
+          title="Retrigger missing downloads (if media archive is enabled)"
+        >
+          Rescan Archive
+        </button>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+<h2>Failures</h2>
+<table>
+  <thead>
+    <th>Programme ID</th>
+    <th>Message</th>
+    <th>Date</th>
+  </thead>
+  <tbody>
+    @for(failure <- stats.failures) {
+    <tr>
+      <td>@failure.programme_id</td>
+      <td>@failure.message</td>
+      <td>@failure.date</td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+<script>
+  const addProgrammeForm = document.getElementById("add-programme-form");
+  const addProgrammeButton = document.getElementById("add-programme-button");
+  addProgrammeForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    fetch(
+      "/admin/refresh?incremental=false&programme_id=" +
+        document.getElementById("programme-id-input").value,
+      { method: "POST" },
+    )
+      .then((r) => r.text())
+      .catch((r) => "error")
+      .then((result) => {
+        addProgrammeButton.textContent = result;
+      });
+  });
+</script>

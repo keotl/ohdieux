@@ -28,27 +28,11 @@ be consumed in any third-party app, such as Apple Podcasts.
   "Tag segment numbers" option to make this explicit.
 
 
-## Configuration avancée (pour développeurs) / Advanced Configuration (for developers)
-### Exécution locale / Running Locally
-**Oh**dieux peut être exécuté localement depuis un environnement Python.
+## Déploiement auto-géré (avancé) / Self-hosted deployment (advanced)
+Ohdieux permet le deploiement local. En mode local, Ohdieux offre une
+fonctionnalité d'archivage de média (désactivé par défaut). Voir
+[DÉPLOIEMENT.md](/docs/DEPLOIEMENT.md) pour débuter.
 
-**Oh**dieux can be run locally in a Python environment.
-
-```bash
-pipenv install --dev
-pipenv run start
-```
-
-### Configuration
-**Oh**dieux est parfaitement configurable dans les deux langues officielles, en conformité avec la loi sur les langues officielles. 
-Le tableau ci-dessous est une liste exhaustive des paramètres d'environnement pouvant
-être utilisés pour paramétriser le logiciel.
-
-**Oh**dieux can be completely configured in both official languages, in compliance with the Official Languages Act.
-The table below is a complete list of the supported environment variables.
-
-| Propriété (FR)               | Property (EN)       | Description                                                                                                                                               |
-|:-----------------------------|:--------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| DELAI_RAFRAICHISSEMENT_CACHE | CACHE_REFRESH_DELAY | Délai au-delà duquel le flux RSS généré est considéré périmé et doit être regénéré. / Delay after which the cached RSS feed should be regenerated.        |
-| STRATEGIE_CACHE              | CACHE_STRATEGY      | `"memory"`,`"redis"` Mécanisme de cache. Pour redis, `REDIS_URL` doit être fourni. / Caching provider. If using redis, `REDIS_URL` must also be provided. |
-
+Ohdieux supports self-hosted deployments. When deployed locally,
+Ohdieux supports media archival (disabled by default). See
+[DEPLOYMENT.md](/docs/DEPLOYMENT.md) to get started.

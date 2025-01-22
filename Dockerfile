@@ -1,24 +1,36 @@
-FROM python:3.12-alpine as pipenv
+FROM eclipse-temurin:21-jdk-alpine as build
+
+RUN apk update
+RUN apk add curl bash
+RUN curl -fL "https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux-static.gz" | gzip -d > /usr/local/bin/cs
+RUN chmod +x /usr/local/bin/cs
+RUN cs install --dir /usr/local/bin scalac:3.5.1 sbt:1.10.2
+
+
 WORKDIR /app
-RUN pip install pipenv
-COPY Pipfile.lock .
-COPY Pipfile .
-RUN pipenv requirements > requirements.txt
+COPY build.sbt .
+COPY project project
+RUN sbt update
 
+COPY src /app/src
+RUN sbt playUpdateSecret
+RUN sbt dist
 
-FROM python:3.12-alpine
+FROM eclipse-temurin:21-jre-alpine
+
+RUN apk add bash ffmpeg
 WORKDIR /app
-RUN apk add git
-COPY --from=pipenv /app/requirements.txt .
-RUN pip install -r requirements.txt
+COPY --from=build /app/target/universal/*.zip .
+RUN unzip *.zip -d ohdieux/
 
-COPY main.py /app
-COPY main_worker.py /app
-COPY ohdieux /app/ohdieux
-
-ENV PYTHONPATH /app
+RUN mkdir -p /tmp/ohdieux /data
+RUN chown 2000:2000 /tmp/ohdieux /data
 
 USER 2000:2000
+WORKDIR /data
 
-EXPOSE 8080
-CMD ["sh", "-c", "gunicorn --workers=${GUNICORN_WORKERS:-1} --threads=${GUNICORN_THREADS:-4} --timeout=10 --bind=0.0.0.0:${PORT:-8080} main"]
+CMD [ "/app/ohdieux/bin/ohdieux", \
+  "-Dpidfile.path=/tmp/ohdieux.pid", \
+  "-Dlogger.resource=prod-logback.xml", \
+  "-Dbase_data_dir=/data/" \
+  ]

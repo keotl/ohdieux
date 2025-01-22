@@ -1,0 +1,36 @@
+@import ca.ligature.ohdieux.services.manifest.types._
+@(programme: RenderedProgrammeManifest)
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+  <channel>
+    <copyright>@programme.author</copyright>
+    <description>@programme.description</description>
+    <itunes:subtitle>@programme.description</itunes:subtitle>
+    <itunes:author>@programme.author</itunes:author>
+    <itunes:image href="@programme.imageUrl"/>
+    <language>fr</language>
+    <link>@programme.canonicalUrl</link>
+    <lastBuildDate>@programme.lastChecked</lastBuildDate>
+    <title>@programme.title</title>
+    <itunes:explicit>clean</itunes:explicit>
+    <itunes:category text="News"/>
+     <image>
+      <url>@programme.imageUrl</url>
+      <title>@programme.title</title>
+      <link>@programme.canonicalUrl</link>
+     </image>
+     @for(episode <- programme.episodes) {
+    <item>
+      <enclosure url="@episode.mediaUrl" length="@episode.duration" type="@episode.mediaType"/>
+      <title>@episode.title</title>
+      <description>@episode.description</description>
+      <guid>@episode.uniqueId</guid>
+      <itunes:author>@programme.author</itunes:author>
+      <itunes:duration>@episode.duration</itunes:duration>
+      <itunes:explicit>clean</itunes:explicit>
+      <pubDate>@episode.date</pubDate>
+    </item>
+    }
+  </channel>
+</rss>
