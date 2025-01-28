@@ -10,6 +10,7 @@ target
 project/project
 project/target
 dist
-/project
 /.metals/
 /.bloop/
+/project/.bloop/
+/project/metals.sbt
