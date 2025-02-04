@@ -2,7 +2,7 @@ FROM eclipse-temurin:21-jdk-alpine as build
 
 RUN apk update
 RUN apk add curl bash
-RUN curl -fL "https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux-static.gz" | gzip -d > /usr/local/bin/cs
+RUN curl -fL https://github.com/coursier/coursier/releases/download/v2.1.24/coursier > /usr/local/bin/cs
 RUN chmod +x /usr/local/bin/cs
 RUN cs install --dir /usr/local/bin scalac:3.5.1 sbt:1.10.2
 
