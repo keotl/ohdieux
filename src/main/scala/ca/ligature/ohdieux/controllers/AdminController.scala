@@ -10,13 +10,16 @@ import ca.ligature.ohdieux.actors.scraper.media.MediaScraperActor
 import play.api.mvc.ControllerComponents
 import ca.ligature.ohdieux.persistence.ProgrammeRepository
 import ca.ligature.ohdieux.services.StatisticsService
+import ca.ligature.ohdieux.actors.config.ProgrammeConfigActor
 import ca.ligature.ohdieux.actors.stats.ArchiveStatisticsActor
+import ca.ligature.ohdieux.persistence.ProgrammeConfigStatus
 
 class AdminController @Inject() (
     val scraper: ActorRef[ProgrammeScraperActor.Message],
     val mediaScraper: ActorRef[MediaScraperActor.Message],
     val archiveStatsActor: ActorRef[ArchiveStatisticsActor.Message],
     val statisticsService: StatisticsService,
+    val programmeConfigActor: ActorRef[ProgrammeConfigActor.Message],
     val controllerComponents: ControllerComponents
 ) extends BaseController {
 
@@ -61,4 +64,24 @@ class AdminController @Inject() (
         Ok("ok")
       }
   }
+
+  def setProgrammeStatus(
+      programme_id: Int,
+      status: String,
+      msg: Option[String]
+  ) = Action { implicit request: Request[AnyContent] =>
+    {
+      programmeConfigActor.tell(
+        ProgrammeConfigActor.Message
+          .SetProgrammeStatus(
+            programme_id,
+            ProgrammeConfigStatus.valueOf(status),
+            msg.getOrElse("Manually suspended by admin.")
+          )
+      )
+
+      Ok("ok")
+    }
+  }
+
 }

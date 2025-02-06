@@ -19,6 +19,7 @@ import ca.ligature.ohdieux.services.manifest.types.ManifestRenderServerOptions
 import ca.ligature.ohdieux.infrastructure.DefaultErrorHandler
 import scala.collection.immutable.HashSet
 import ca.ligature.ohdieux.actors.stats.ArchiveStatisticsActor
+import ca.ligature.ohdieux.actors.config.ProgrammeConfigActor
 
 class Module(environment: Environment, configuration: Configuration)
     extends AbstractModule
@@ -144,6 +145,16 @@ class Module(environment: Environment, configuration: Configuration)
         archive
       ),
       "archive-stats"
+    )
+  }
+
+  @Provides @Singleton
+  def provideProgrammeConfigActor(
+      programmeConfigRepository: ProgrammeConfigRepository
+  ): ActorRef[ProgrammeConfigActor.Message] = {
+    return ActorSystem[ProgrammeConfigActor.Message](
+      ProgrammeConfigActor(programmeConfigRepository),
+      "programme-config"
     )
   }
 }

@@ -61,6 +61,12 @@
         >
           Rescan Archive
         </button>
+        <button
+          hx-post="/admin/programme/@programme.programmeId/status?status=Failed"
+          title="Stop refreshing programme"
+        >
+          Suspend
+        </button>
       </td>
     </tr>
     }
@@ -73,13 +79,22 @@
     <th>Programme ID</th>
     <th>Message</th>
     <th>Date</th>
+    <th></th>
   </thead>
   <tbody>
     @for(failure <- stats.failures) {
     <tr>
       <td>@failure.programme_id</td>
-      <td>@failure.message</td>
+      <td style="max-width: 50vw">@failure.message</td>
       <td>@failure.date</td>
+      <td>
+        <button
+          hx-post="/admin/programme/@failure.programme_id/status?status=Ok"
+          title="Remove error status to resume refreshing"
+        >
+         Clear error 
+        </button>
+      </td>
     </tr>
     }
   </tbody>
