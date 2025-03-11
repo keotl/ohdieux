@@ -8,7 +8,7 @@ import ca.ligature.ohdieux.ohdio.RCModels.ProgrammeContentDetailItem
 private class EpisodeIterator(
     firstPage: RCModels.ProgrammeById,
     fetcher: (pageNumber: Int) => FetchResult[RCModels.ProgrammeById],
-    direction: "normal" | "reverse"
+    val direction: "normal" | "reverse"
 ) extends Iterator[RCModels.ProgrammeContentDetailItem] {
 
   private val totalItems =

@@ -75,4 +75,15 @@ ON CONFLICT DO UPDATE SET ${updatePlaceholders}
     }
     // }
   }
+
+  override def countByProgrammeId(programmeId: Int): Int = {
+    db.withConnection { connection =>
+      {
+        SQL("SELECT COUNT() FROM episodes WHERE programme_id={programme_id}")
+          .on("programme_id" -> programmeId)
+          .as(SqlParser.scalar[Int].single)(connection)
+      }
+    }
+  }
+
 }

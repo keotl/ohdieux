@@ -16,4 +16,5 @@ trait EpisodeRepository {
   def getById(id: Int): Option[EpisodeEntity]
   def getByProgrammeId(programmeId: Int): Seq[EpisodeEntity]
   def save(entity: EpisodeEntity): Unit
+  def countByProgrammeId(programmeId: Int): Int
 }

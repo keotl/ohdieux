@@ -7,6 +7,9 @@ import ca.ligature.ohdieux.persistence.EpisodeRepository
 import ca.ligature.ohdieux.ohdio.RCModels
 import scala.annotation.tailrec
 import ca.ligature.ohdieux.actors.file.FileArchiveActor
+import play.api.Logger
+import ca.ligature.ohdieux.ohdio.RCModels.ProgrammeById
+import ca.ligature.ohdieux.persistence.ProgrammeEntity
 
 private case class ProgrammeScraperActorImpl(
     api: ApiClient,
@@ -19,6 +22,8 @@ private case class ProgrammeScraperActorImpl(
     ) => Unit,
     onNewProgrammeImage: (programmeId: Int, imageUrl: String) => Unit
 ) {
+  val logger: Logger = Logger(this.getClass())
+
   def fetchProgramme(
       programmeId: Int,
       incremental: Boolean
@@ -40,8 +45,13 @@ private case class ProgrammeScraperActorImpl(
     val firstPage = fetcher(1)
 
     firstPage match {
-      case Success(page) =>
+      case Success(page) => {
         val programme = Assembler.assembleProgramme(programmeId, page)
+        val episodes = EpisodeIterator(page, fetcher)
+        val knownEpisodes = episodeRepository.countByProgrammeId(programmeId)
+        val forceRefresh =
+          shouldForceFullRefresh(programmeId, page, episodes, knownEpisodes)
+
         programmeRepository.save(programme)
         onNewProgrammeImage(
           programmeId,
@@ -49,10 +59,11 @@ private case class ProgrammeScraperActorImpl(
         )
         saveEpisodes(
           programmeId,
-          EpisodeIterator(page, fetcher),
-          incremental,
+          episodes,
+          !(forceRefresh || !incremental),
           1
         )
+      }
       case _ => ()
     }
   }
@@ -90,5 +101,28 @@ private case class ProgrammeScraperActorImpl(
       .find(_.isSuccess)
       .map(_.get)
       .map(Assembler.guessProgrammeType)
+
+  private def shouldForceFullRefresh(
+      programmeId: Int,
+      firstPage: ProgrammeById,
+      episodeIterator: EpisodeIterator,
+      knownEpisodes: Int
+  ): Boolean = {
+
+    val advertisedEpisodes =
+      firstPage.content.contentDetail.pagedConfiguration.totalNumberOfItems
+
+    val shouldForceRefresh = episodeIterator.direction == "normal" &&
+      advertisedEpisodes < 10 &&
+      knownEpisodes + 2 < advertisedEpisodes
+
+    if (shouldForceRefresh) {
+      logger.warn(
+        s"Forcing full refresh of programme ${programmeId}, since it contains ${advertisedEpisodes} advertised episodes while we know of ${knownEpisodes}"
+      )
+    }
+
+    shouldForceRefresh
+  }
 
 }
