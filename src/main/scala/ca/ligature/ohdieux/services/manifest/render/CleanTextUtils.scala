@@ -9,7 +9,6 @@ object CleanTextUtils {
       |> replaceLineBreaks
       |> unsafeStripTags
       |> StringEscapeUtils.unescapeHtml4
-      |> StringEscapeUtils.escapeXml11
   }
 
   private def replaceLineBreaks(text: String): String =
