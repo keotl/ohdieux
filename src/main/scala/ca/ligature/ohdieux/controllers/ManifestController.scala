@@ -38,7 +38,7 @@ class ManifestController @Inject() (
 
     programme
       .map(p =>
-        Ok(views.html.manifest(p))
+        Ok(views.xml.manifest(p))
           .as("application/xml")
           .withHeaders(
             "Cache-Control" -> "max-age=1800, stale-if-error=86400"
